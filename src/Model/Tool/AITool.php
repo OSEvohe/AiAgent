@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Tool;
+
+use OpenAI\Responses\Chat\CreateResponseToolCall;
+use OpenAI\Responses\Responses\Input\FunctionToolCallOutput;
 
 abstract class AITool
 {
@@ -33,5 +36,5 @@ abstract class AITool
         return $this->function['name'];
     }
 
-    abstract public function execute(array $arguments): array;
+    abstract public function execute(CreateResponseToolCall $toolCall): ToolResultResponse;
 }

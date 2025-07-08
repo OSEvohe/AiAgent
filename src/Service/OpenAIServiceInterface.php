@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Model\AIMessage;
+use App\Model\UserMessage;
 use OpenAI\Client;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Responses\StreamResponse;
@@ -34,10 +34,9 @@ interface OpenAIServiceInterface
     /**
      * Sends a message to the LLM and returns the response
      *
-     * @param AIMessage|null $message
-     * @param array $history
+     * @param array $context
      * @param bool $stream
      * @return CreateResponse|StreamResponse
      */
-    public function sendToLlm(?AIMessage $message, array $history = [], bool $stream = false): CreateResponse|StreamResponse;
+    public function sendToLlm(array $context= []): CreateResponse|StreamResponse;
 }

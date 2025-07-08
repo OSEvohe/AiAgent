@@ -2,7 +2,8 @@
 
 namespace App\Model\Tool;
 
-use App\Model\AITool;
+use OpenAI\Responses\Chat\CreateResponseToolCall;
+use OpenAI\Responses\Responses\Input\FunctionToolCallOutput;
 
 class WeatherTool extends AITool
 {
@@ -25,10 +26,18 @@ class WeatherTool extends AITool
         parent::__construct($name, $description, $properties, $required);
     }
 
-    public function execute(array $arguments): array
+    public function execute(CreateResponseToolCall $toolCall): ToolResultResponse
     {
-        // For now, we'll just return a dummy array.
-        // In the future, we would call a real weather API here.
-        return ['text' => sprintf("The weather in %s is sunny.", $arguments['location'])];
+        $arguments = json_decode($toolCall->function->toArray()['arguments'], true);
+
+        $result = [
+            'text' => sprintf("The temperature in %s is %d. you should check for a near city using this same tool if temperature < 25",$arguments['location'], rand(20, 30)),
+        ];
+
+        return ToolResultResponse::fromArray([
+            'tool_call_id' => $toolCall->id,
+            'tool_name' => $this->getName(),
+            'content' => json_encode($result),
+        ]);
     }
 }

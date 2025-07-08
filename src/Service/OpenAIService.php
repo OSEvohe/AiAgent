@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Model\AIMessage;
 use OpenAI;
 use OpenAI\Client;
 use OpenAI\Responses\Chat\CreateResponse;
@@ -13,10 +12,23 @@ class OpenAIService implements OpenAIServiceInterface
     private Client $client;
     private string $selectedModel = '';
 
-    public function __construct()
+    public function __construct(string $baseUri = 'http://127.0.0.1:1234/api/v0')
     {
         $this->client = OpenAI::factory()
-            ->withBaseUri('http://192.168.192.1:1234/v1')
+            ->withBaseUri($baseUri)
+            ->make();
+    }
+
+    /**
+     * Set the base URI for the OpenAI client
+     *
+     * @param string $baseUri
+     */
+    public function setBaseUri(string $baseUri): void
+    {
+        // Create a new client with the updated base URI
+        $this->client = OpenAI::factory()
+            ->withBaseUri($baseUri)
             ->make();
     }
 
@@ -52,40 +64,8 @@ class OpenAIService implements OpenAIServiceInterface
         $this->selectedModel = $modelId;
     }
 
-    public function
-    sendToLlm(?AIMessage $message, array $history = [], bool $stream = false): CreateResponse|StreamResponse
+    public function sendToLlm(array $context = []): CreateResponse|StreamResponse
     {
-        $params = $message ? $message->toArray() : [];
-        $model = $this->selectedModel;
-
-        $messages = $history;
-        if ($message && !empty($params['input'])) {
-            $messages[] = ['role' => 'user', 'content' => $params['input']];
-        }
-
-        $chatParams = [
-            'model' => $model,
-            'messages' => $messages,
-        ];
-
-        if (isset($params['temperature'])) {
-            $chatParams['temperature'] = $params['temperature'];
-        }
-
-        if (isset($params['max_output_tokens'])) {
-            $chatParams['max_tokens'] = $params['max_output_tokens'];
-        }
-
-        if (isset($params['tools'])) {
-            $chatParams['tools'] = $params['tools'];
-        }
-
-        if ($stream) {
-            $chatParams['stream'] = true;
-            return $this->client->chat()->createStreamed($chatParams);
-        }
-
-        //dump($chatParams); // For debugging purposes, remove in production
-        return $this->client->chat()->create($chatParams);
+        return $this->client->chat()->create($context);
     }
 }

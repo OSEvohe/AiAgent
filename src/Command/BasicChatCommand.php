@@ -6,23 +6,22 @@ use App\Model\Discussion;
 use App\Model\IO\Terminal;
 use App\Model\Tool\WeatherTool;
 use App\Service\OpenAIServiceInterface;
-use OpenAI\Responses\Chat\CreateResponse;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'basic-agent',
+    name: 'basic-chat-agent',
     description: 'Add a short description for your command',
 )]
-class BasicAgentCommand extends Command
+class BasicChatCommand extends Command
 {
     public function __construct(
         private readonly OpenAIServiceInterface $openAIService,
+        //private readonly ToolServiceInterface $toolService
     )
     {
         parent::__construct();
@@ -30,9 +29,7 @@ class BasicAgentCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addArgument('input', InputArgument::OPTIONAL, 'Text Input sent to LLM')
-            ->addOption('llm-url', null, InputOption::VALUE_OPTIONAL, 'URL of the LLM API endpoint');
+        $this->addOption('llm-url', null, InputOption::VALUE_OPTIONAL, 'URL of the LLM API endpoint');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -45,21 +42,26 @@ class BasicAgentCommand extends Command
             $this->openAIService->setBaseUri($llmUrlOption);
         }
 
-        $arg1 = $input->getArgument('input');
-
-        if (!$arg1) {
-            $io->note(sprintf('You passed an argument: %s', $arg1));
-            return Command::FAILURE;
-        }
-
         $discussion = new Discussion(
             openAIService: $this->openAIService,
-            model: 'devstral-small-2505@q5_k_xl',
+            model: '',
             io: new Terminal($output),
-            tools: [new WeatherTool()],
+            tools: [new WeatherTool()]
         );
 
-        $discussion->sendUserMessage($input);
+
+        while (true) {
+            $input = $io->ask('You:');
+            if ($input === '/exit' || $input === '/quit') {
+                $io->success('Exiting the chat.');
+                break;
+            }
+            if (empty($input)) {
+                continue;
+            }
+            $discussion->sendUserMessage($input);
+        }
+
 
         return Command::SUCCESS;
     }
