@@ -3,23 +3,34 @@
 namespace App\Model\Tool;
 
 use App\Model\IO\IOInterface;
+use App\Model\MCP\MCPServer;
+use App\Model\MCP\McpTool;
+use Exception;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
 
 class ToolsHandler
 {
     public function __construct(
         /** @var AITool[] */
-        private readonly array $tools = [],
+        private array $tools = [],
+        /** @var MCPServer[] */
+        private readonly array $mcps = [],
         private readonly ?IOInterface $io = null,
-    )
-    {
+    ) {
+        // add each tools provided by MCPs to the tools array
+        foreach ($this->mcps as $mcp) {
+            foreach ($mcp->listTools() as $tool) {
+                $this->tools[] = new McpTool($tool, $mcp);
+            }
+        }
     }
 
     /**
      * @param CreateResponseToolCall[] $toolCalls
      */
-    public function handleToolCalls(array $toolCalls): array
-    {
+    public function handleToolCalls(
+        array $toolCalls
+    ): array {
         $resultCalls = [];
 
         foreach ($toolCalls as $toolCall) {
@@ -34,6 +45,23 @@ class ToolsHandler
         return $resultCalls;
     }
 
+    /**
+     * @throws Exception
+     */
+    public function handleSingleToolCall(
+        CreateResponseToolCall $toolCall
+    ): ToolResultResponse {
+        foreach ($this->tools as $tool) {
+            if ($tool->getName() === $toolCall->function->name) {
+                $this->io?->output("Running tool: {$tool->getName()} with arguments: {$toolCall->function->arguments}");
+                return $tool->execute($toolCall);
+            }
+        }
+        throw new Exception("Tool not found: " . $toolCall->function->name);
+    }
 
-
+    public function getTools(): array
+    {
+        return $this->tools;
+    }
 }

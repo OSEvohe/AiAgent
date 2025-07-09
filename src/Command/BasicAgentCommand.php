@@ -4,9 +4,12 @@ namespace App\Command;
 
 use App\Model\Discussion;
 use App\Model\IO\Terminal;
+use App\Model\MCP\Jetbrains;
+use App\Model\MCP\ServerFileSystem;
+use App\Model\Tool\FileSystemTool;
+use App\Model\Tool\TestTool;
 use App\Model\Tool\WeatherTool;
 use App\Service\OpenAIServiceInterface;
-use OpenAI\Responses\Chat\CreateResponse;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,8 +26,7 @@ class BasicAgentCommand extends Command
 {
     public function __construct(
         private readonly OpenAIServiceInterface $openAIService,
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -52,14 +54,18 @@ class BasicAgentCommand extends Command
             return Command::FAILURE;
         }
 
+
         $discussion = new Discussion(
             openAIService: $this->openAIService,
-            model: 'devstral-small-2505@q5_k_xl',
+            model: '',
             io: new Terminal($output),
-            tools: [new WeatherTool()],
+            tools: [],
+            mcps: [new Jetbrains()],
         );
 
-        $discussion->sendUserMessage($input);
+        $discussion->sendUserMessage($arg1);
+
+        //dump($discussion->getContext());
 
         return Command::SUCCESS;
     }

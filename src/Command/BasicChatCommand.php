@@ -4,6 +4,8 @@ namespace App\Command;
 
 use App\Model\Discussion;
 use App\Model\IO\Terminal;
+use App\Model\MCP\Jetbrains;
+use App\Model\Tool\FileSystemTool;
 use App\Model\Tool\WeatherTool;
 use App\Service\OpenAIServiceInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -46,7 +48,8 @@ class BasicChatCommand extends Command
             openAIService: $this->openAIService,
             model: '',
             io: new Terminal($output),
-            tools: [new WeatherTool()]
+            tools: [],
+            mcps: [new Jetbrains()],
         );
 
 

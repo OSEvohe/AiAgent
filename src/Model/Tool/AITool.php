@@ -10,16 +10,12 @@ abstract class AITool
     private string $type = 'function';
     protected array $function;
 
-    public function __construct(string $name, string $description, array $properties, array $required = [])
+    public function __construct(string $name, string $description, array $parameters)
     {
         $this->function = [
             'name' => $name,
             'description' => $description,
-            'parameters' => [
-                'type' => 'object',
-                'properties' => $properties,
-                'required' => $required,
-            ],
+            'parameters' => $parameters,
         ];
     }
 
