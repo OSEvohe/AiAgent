@@ -16,7 +16,8 @@ class OpenAIService implements OpenAIServiceInterface
     {
         $this->client = OpenAI::factory()
             ->withBaseUri($baseUri)
-            ->make();
+->withHttpClient(new \GuzzleHttp\Client(['timeout' => 1200]))
+->make();
     }
 
     /**
