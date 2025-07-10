@@ -109,7 +109,7 @@ class Discussion
                 $this->context[] = $toolResult->toArray();
                 $this->processResponse($step + 1);
                 if ($step === 0) {
-                    $this->context[] = $this->createUserMessage('If task is not complete continue with the next step. If task is complete ask for further instructions. If you are unsure about the next step, please ask for clarification.');
+                    $this->context[] = $this->createUserMessage('If task is not complete continue with the next step. If task is complete ask for further instructions. If you are unsure about the next step, please ask for clarification.')->toArray();
                     $this->processResponse();
                 }
             }
