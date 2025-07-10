@@ -5,12 +5,10 @@ namespace App\Model\MCP;
 use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\ServerConfig;
 
-class Jetbrains extends MCPServer
+class Jetbrains extends MCPClient
 {
     protected function createServerConfig(): ServerConfig
     {
-        $userHome = '/home/sebastien';
-
         return new ServerConfig(
             name: 'jetbrains',
             transport: TransportType::Stdio,

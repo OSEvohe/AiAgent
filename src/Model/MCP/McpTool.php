@@ -11,7 +11,7 @@ use Throwable;
 
 class McpTool extends AITool
 {
-    public function __construct(ToolDefinition $tool, private readonly MCPServer $server)
+    public function __construct(ToolDefinition $tool, private readonly MCPClient $server)
     {
         parent::__construct(
             name: $tool->name,

@@ -10,7 +10,7 @@ use PhpMcp\Client\ServerConfig;
 use Throwable;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
 
-abstract class MCPServer
+abstract class MCPClient
 {
     protected Client $client;
     protected ServerConfig $serverConfig;
@@ -57,7 +57,9 @@ abstract class MCPServer
 
     public function __destruct()
     {
+        dump('Disconnecting MCP client: ' . $this->getClientName());
         $this->client->disconnect();
+        dump('Disconnected MCP client: ' . $this->getClientName());
     }
 
     public function callTool(string $toolName, array $arguments): CallToolResult

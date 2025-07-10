@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Model\Discussion;
 use App\Model\IO\Terminal;
 use App\Model\MCP\Jetbrains;
+use App\Model\Tool\TaskAgentTool;
 use App\Service\OpenAIService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -35,19 +36,19 @@ class BasicAgentCommand extends Command
             return Command::FAILURE;
         }
 
+        $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
+
         $discussion = new Discussion(
-            openAIService: new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']) ,
+            openAIService: $aiService,
             model: '',
             io: new Terminal($output),
-            tools: [],
-            mcps: [new Jetbrains()],
+            tools: [new TaskAgentTool(new Terminal($output), 'Jetbrains')],
+            mcps: [],
         );
 
         $preparedPrompt = $discussion->preparePrompt($prompt);
 
         $io->writeln($discussion->sendUserMessage($preparedPrompt));
-
-        //dump($discussion->getContext());
 
         return Command::SUCCESS;
     }

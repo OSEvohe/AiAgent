@@ -3,7 +3,7 @@
 namespace App\Model\Tool;
 
 use App\Model\IO\IOInterface;
-use App\Model\MCP\MCPServer;
+use App\Model\MCP\MCPClient;
 use App\Model\MCP\McpTool;
 use Exception;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
@@ -16,7 +16,7 @@ class ToolsHandler
     public function __construct(
         /** @var AITool[] */
         private array $tools = [],
-        /** @var MCPServer[] */
+        /** @var MCPClient[] */
         private readonly array $mcps = [],
         private readonly ?IOInterface $io = null,
     ) {

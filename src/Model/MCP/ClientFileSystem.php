@@ -5,7 +5,7 @@ namespace App\Model\MCP;
 use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\ServerConfig;
 
-class ServerFileSystem extends MCPServer
+class ClientFileSystem extends MCPClient
 {
     protected function createServerConfig(): ServerConfig
     {
