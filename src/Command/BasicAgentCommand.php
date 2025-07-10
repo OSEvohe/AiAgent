@@ -36,7 +36,7 @@ class BasicAgentCommand extends Command
         }
 
         $discussion = new Discussion(
-            openAIService: new OpenAIService($_ENV['LLM_URL'] . '/api/v0'),
+            openAIService: new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']) ,
             model: '',
             io: new Terminal($output),
             tools: [],
