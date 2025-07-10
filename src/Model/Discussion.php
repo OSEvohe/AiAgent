@@ -48,8 +48,8 @@ class Discussion
     public function sendUserMessage(string $userInput): void
     {
         try {
-            //$preInput = "You are a helpful Agent. Please answer the following question:";
-            //$this->context[] = $this->createUserMessage($preInput)->toArray();
+            $preInput = "Complete the following task step by step. Please summarize the current state and do not ask for further instructions unless asked to do so.";
+            $this->context[] = $this->createUserMessage($preInput)->toArray();
             $this->context[] = $this->createUserMessage($userInput)->toArray();
             $this->processResponse();
         } catch (Exception $e) {
@@ -75,7 +75,7 @@ class Discussion
     /**
      * @throws Exception
      */
-    private function processResponse(): void
+    private function processResponse(int $step = 0): void
     {
         $response = $this->processContext();
 
@@ -89,8 +89,12 @@ class Discussion
             if ($choice->message->toolCalls) {
                 $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
                 $this->context[] = $toolResult->toArray();
-                $this->processResponse();
-                $this->sendUserMessage('continue');
+                $this->processResponse($step + 1);
+
+                if ($step === 0) {
+                    $this->sendUserMessage('If task is not complete continue with the next step. If task is complete ask for further instructions. If you are unsure about the next step, please ask for clarification.');
+                }
+
             }
         }
     }
