@@ -25,7 +25,7 @@ class Discussion
         private float $temperature = 0.15,
         private int $max_output_tokens = 5000,
         private string $tool_choice = 'auto',
-        private bool $parallel_tool_calls = false,
+        private bool $parallel_tool_calls = true,
         private bool $store = true,
         private array $metadata = [],
     ) {
@@ -36,6 +36,17 @@ class Discussion
     public function getContext(): array
     {
         return $this->context;
+    }
+
+    /**
+     * @param array $message
+     * @return void
+     */
+    public function addToContext(array $message = []): void
+    {
+        if (!empty($message)) {
+            $this->context[] = $message;
+        }
     }
 
     public function getTools(): array
@@ -106,7 +117,7 @@ class Discussion
             if ($choice->message->toolCalls) {
                 $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
                 $this->context[] = $toolResult->toArray();
-                $this->processResponse($step + 1);
+                $responseContent = $this->processResponse($step + 1);
                 /*if ($step === 0) {
                     $this->context[] = $this->createUserMessage('If task is not complete continue with the next step. If task is complete ask for further instructions. If you are unsure about the next step, please ask for clarification.')->toArray();
                     $this->processResponse();
@@ -114,7 +125,6 @@ class Discussion
             }
         }
 
-        $step >0 ?: dump([$this->discussionID => $this->context]);
         return $responseContent;
     }
 

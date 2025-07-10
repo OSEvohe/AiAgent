@@ -20,12 +20,22 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class BasicAgentCommand extends Command
 {
+    /**
+     * Configure the command
+     */
     protected function configure(): void
     {
         $this
             ->addArgument('input', InputArgument::OPTIONAL, 'Text Input sent to LLM');
     }
 
+    /**
+     * Execute the command
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -42,7 +52,15 @@ class BasicAgentCommand extends Command
             openAIService: $aiService,
             model: '',
             io: new Terminal($output),
-            tools: [new TaskAgentTool(new Terminal($output), 'Jetbrains')],
+            tools: [
+                new TaskAgentTool(
+                    output: new Terminal($output),
+                    agentName: 'Jetbrains_Agent',
+                    description: 'This is an AI agent that can perform coding tasks using Jetbrains tools. Use this agent to automate coding tasks. Ask for precise tasks, Agent may ask you for more details if needed. Split Your tasks by calling this tool multiple times. Do not ask for the same task if an error is returned',
+                    mcps: [new Jetbrains()],
+                    systemMessage: 'You are a coding agent that can perform tasks using Jetbrains tools. You can use the tools provided by the MCPs to perform tasks. If you need more information, ask the user for details.'
+                )
+            ],
             mcps: [],
         );
 

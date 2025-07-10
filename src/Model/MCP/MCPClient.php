@@ -59,7 +59,6 @@ abstract class MCPClient
     {
         dump('Disconnecting MCP client: ' . $this->getClientName());
         $this->client->disconnect();
-        dump('Disconnected MCP client: ' . $this->getClientName());
     }
 
     public function callTool(string $toolName, array $arguments): CallToolResult
