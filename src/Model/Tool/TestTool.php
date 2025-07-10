@@ -13,7 +13,7 @@ class TestTool extends AITool
         $parameters = [
             'type' => 'object',
             'properties' => [
-                'none' => 'no parameters'
+                'none' => 'none'
             ]
         ];
 

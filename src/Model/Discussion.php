@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use App\Model\Agent\Agent;
+use App\Model\Agent\ChatAgent;
 use App\Model\IO\IOInterface;
 use App\Model\Tool\ToolsHandler;
 use App\Service\OpenAIServiceInterface;
@@ -18,10 +20,9 @@ class Discussion
     public function __construct(
         private OpenAIServiceInterface $openAIService,
         private string $model,
+        private Agent $agent,
         private IOInterface $io,
         private array $context = [],
-        private array $tools = [],
-        private array $mcps = [],
         private float $temperature = 0.15,
         private int $max_output_tokens = 5000,
         private string $tool_choice = 'auto',
@@ -29,7 +30,7 @@ class Discussion
         private bool $store = true,
         private array $metadata = [],
     ) {
-        $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
+        $this->toolsHandler = new ToolsHandler($this->agent->getTools(), $this->agent->getMcps(), $this->io);
         $this->discussionID = uniqid('discussion_', true);
     }
 
@@ -87,9 +88,8 @@ class Discussion
         $discussion = new Discussion(
             openAIService: $this->openAIService,
             model: $this->model,
+            agent: new ChatAgent(), // on utilise un agent de type ChatAgent pour reformuler le prompt
             io: $this->io,
-            tools: [],
-            mcps: [],
             temperature: $this->temperature,
             tool_choice: 'none',
             parallel_tool_calls: false,

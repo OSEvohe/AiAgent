@@ -9,28 +9,9 @@ use PhpMcp\Client\ServerConfig;
  * Jetbrains MCP Client
  * This class provides configuration for the Jetbrains MCP client.
  */
-class Jetbrains extends MCPClient
+class Jetbrains extends McpClient
 {
-    /**
-     * Create server configuration
-     * This method initializes and returns a ServerConfig object
-     * with specific settings for the Jetbrains MCP client.
-     *
-     * @return ServerConfig
-     */
-    protected function createServerConfig(): ServerConfig
-    {
-        return new ServerConfig(
-            name: 'jetbrains',
-            transport: TransportType::Stdio,
-            timeout: 60,
-            command: 'npx',
-            args: [
-                '-y',
-                '@jetbrains/mcp-proxy',
-            ],
-        );
-    }
+
 
     /**
      * Get client name
@@ -53,4 +34,36 @@ class Jetbrains extends MCPClient
     {
         return '1.0';
     }
+
+    public function listTools(): array
+    {
+        $list = [];
+
+        $excludedTools = [
+            'get_open_in_editor_file_text',
+            'get_open_in_editor_file_path',
+            'get_selected_in_editor_text',
+            'replace_selected_text',
+            'replace_current_file_text',
+            'get_all_open_file_texts',
+            'get_all_open_file_paths',
+            'list_available_actions',
+            'execute_action_by_id',
+            'get_progress_indicator',
+            'wait',
+            'reformat_current_file',
+            'get_terminal_text',
+            'find_commit_by_message'
+        ];
+
+        foreach (parent::listTools() as $tool) {
+            if (!in_array($tool->name, $excludedTools)) {
+                $list[] = $tool;
+            }
+        }
+
+        return $list;
+    }
+
+
 }

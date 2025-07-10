@@ -3,7 +3,7 @@
 namespace App\Model\Tool;
 
 use App\Model\IO\IOInterface;
-use App\Model\MCP\MCPClient;
+use App\Model\MCP\McpClient;
 use App\Model\MCP\McpTool;
 use Exception;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
@@ -16,7 +16,7 @@ class ToolsHandler
     public function __construct(
         /** @var AITool[] */
         private array $tools = [],
-        /** @var MCPClient[] */
+        /** @var McpClient[] */
         private readonly array $mcps = [],
         private readonly ?IOInterface $io = null,
     ) {
@@ -39,7 +39,7 @@ class ToolsHandler
         foreach ($toolCalls as $toolCall) {
             foreach ($this->tools as $tool) {
                 if ($tool->getName() === $toolCall->function->name) {
-                    $this->io?->output("Running tool: {$tool->getName()} with arguments: {$toolCall->function->arguments}");
+                    $this->io?->output("Running tool: {$tool->getName()}");
                 }
 
                 $resultCalls[] = $tool->execute($toolCall);
