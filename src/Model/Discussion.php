@@ -13,6 +13,8 @@ class Discussion
 {
     private ToolsHandler $toolsHandler;
 
+    private string $discussionID;
+
     public function __construct(
         private OpenAIServiceInterface $openAIService,
         private string $model,
@@ -28,6 +30,7 @@ class Discussion
         private array $metadata = [],
     ) {
         $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
+        $this->discussionID = uniqid('discussion_', true);
     }
 
     public function getContext(): array
@@ -74,19 +77,15 @@ class Discussion
             openAIService: $this->openAIService,
             model: $this->model,
             io: $this->io,
-            context: $this->context,
-            tools: $this->tools,
-            mcps: $this->mcps,
+            tools: [],
+            mcps: [],
             temperature: $this->temperature,
-            max_output_tokens: $this->max_output_tokens,
-            tool_choice: $this->tool_choice,
-            parallel_tool_calls: $this->parallel_tool_calls,
-            store: $this->store,
-            metadata: $this->metadata
+            tool_choice: 'none',
+            parallel_tool_calls: false,
         );
 
-        // on demande au LLM, de reformuler le prompt en anglais de ma manière à ce qu'il soit le plus clair possible
-        return $discussion->sendUserMessage("Please rephrase the following prompt in English to make it as clear as possible: " . $prompt);
+        // on demande au LLM, de reformuler le prompt en anglais de manière à ce qu'il soit le plus clair possible
+        return $discussion->sendUserMessage("Please rewrite the following prompt in English to make it as clear as possible: \"" . $prompt . "\"");
     }
 
     /**
@@ -108,13 +107,14 @@ class Discussion
                 $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
                 $this->context[] = $toolResult->toArray();
                 $this->processResponse($step + 1);
-                if ($step === 0) {
+                /*if ($step === 0) {
                     $this->context[] = $this->createUserMessage('If task is not complete continue with the next step. If task is complete ask for further instructions. If you are unsure about the next step, please ask for clarification.')->toArray();
                     $this->processResponse();
-                }
+                }*/
             }
         }
 
+        $step >0 ?: dump([$this->discussionID => $this->context]);
         return $responseContent;
     }
 

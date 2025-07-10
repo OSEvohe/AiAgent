@@ -4,7 +4,7 @@ namespace App\Model\Tool;
 
 use App\Model\Discussion;
 use App\Model\IO\IOInterface;
-use App\Model\IO\Terminal;
+
 use App\Model\MCP\Jetbrains;
 use App\Service\OpenAIService;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
@@ -13,6 +13,11 @@ class TaskAgentTool extends AITool
 {
     private Discussion $discussion;
 
+    /**
+     * TaskAgentTool constructor.
+     * @param IOInterface $output
+     * @param string $agentName
+     */
     public function __construct(IOInterface $output, string $agentName = 'TaskAgent')
     {
         $name = $agentName . 'Tool';
@@ -36,14 +41,20 @@ class TaskAgentTool extends AITool
         parent::__construct($name, $description, $parameters);
     }
 
+    /**
+     * Executes the task agent tool.
+     * @param CreateResponseToolCall $toolCall
+     * @return ToolResultResponse
+     */
     public function execute(CreateResponseToolCall $toolCall): ToolResultResponse
     {
         $arguments = json_decode($toolCall->function->toArray()['arguments'], true);
         $task = $arguments['task'];
 
-        // Initialize the agent (implementation depends on your application logic)
+        $completedTask = $this->discussion->sendUserMessage($task);
+
         $result = [
-            'result' => sprintf('%s', $task),
+            'result' => sprintf('%s', $completedTask),
         ];
 
         return ToolResultResponse::fromArray([
