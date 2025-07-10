@@ -12,10 +12,11 @@ class OpenAIService implements OpenAIServiceInterface
     private Client $client;
     private string $selectedModel = '';
 
-    public function __construct(string $baseUri = 'http://127.0.0.1:1234/api/v0')
+    public function __construct(string $baseUri = 'http://127.0.0.1:1234/v1')
     {
         $this->client = OpenAI::factory()
             ->withBaseUri($baseUri)
+            ->withHttpClient(new \GuzzleHttp\Client(['timeout' => 1200]))
             ->make();
     }
 

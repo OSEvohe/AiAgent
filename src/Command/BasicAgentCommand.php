@@ -4,14 +4,13 @@ namespace App\Command;
 
 use App\Model\Discussion;
 use App\Model\IO\Terminal;
-use App\Model\Tool\WeatherTool;
-use App\Service\OpenAIServiceInterface;
-use OpenAI\Responses\Chat\CreateResponse;
+use App\Model\MCP\Jetbrains;
+use App\Model\Tool\TaskAgentTool;
+use App\Service\OpenAIService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -21,45 +20,53 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class BasicAgentCommand extends Command
 {
-    public function __construct(
-        private readonly OpenAIServiceInterface $openAIService,
-    )
-    {
-        parent::__construct();
-    }
-
+    /**
+     * Configure the command
+     */
     protected function configure(): void
     {
         $this
-            ->addArgument('input', InputArgument::OPTIONAL, 'Text Input sent to LLM')
-            ->addOption('llm-url', null, InputOption::VALUE_OPTIONAL, 'URL of the LLM API endpoint');
+            ->addArgument('input', InputArgument::OPTIONAL, 'Text Input sent to LLM');
     }
 
+    /**
+     * Execute the command
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $prompt = $input->getArgument('input');
 
-        // Check if a custom LLM URL was provided via command line option
-        $llmUrlOption = $input->getOption('llm-url');
-        if ($llmUrlOption) {
-            $this->openAIService->setBaseUri($llmUrlOption);
-        }
-
-        $arg1 = $input->getArgument('input');
-
-        if (!$arg1) {
-            $io->note(sprintf('You passed an argument: %s', $arg1));
+        if (!$prompt) {
+            $io->note('No input provided. Please provide a prompt as an argument.');
             return Command::FAILURE;
         }
 
+        $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
+
         $discussion = new Discussion(
-            openAIService: $this->openAIService,
-            model: 'devstral-small-2505@q5_k_xl',
+            openAIService: $aiService,
+            model: '',
             io: new Terminal($output),
-            tools: [new WeatherTool()],
+            tools: [
+                new TaskAgentTool(
+                    output: new Terminal($output),
+                    agentName: 'Jetbrains_Agent',
+                    description: 'This is an AI agent that can perform coding tasks using Jetbrains tools. Use this agent to automate coding tasks. Ask for precise tasks, Agent may ask you for more details if needed. Split Your tasks by calling this tool multiple times. Do not ask for the same task if an error is returned',
+                    mcps: [new Jetbrains()],
+                    systemMessage: 'You are a coding agent that can perform tasks using Jetbrains tools. You can use the tools provided by the MCPs to perform tasks. If you need more information, ask the user for details.'
+                )
+            ],
+            mcps: [],
         );
 
-        $discussion->sendUserMessage($input);
+        $preparedPrompt = $discussion->preparePrompt($prompt);
+
+        $io->writeln($discussion->sendUserMessage($preparedPrompt));
 
         return Command::SUCCESS;
     }

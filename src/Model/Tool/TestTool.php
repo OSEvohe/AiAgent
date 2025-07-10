@@ -3,28 +3,18 @@
 namespace App\Model\Tool;
 
 use OpenAI\Responses\Chat\CreateResponseToolCall;
-use OpenAI\Responses\Responses\Input\FunctionToolCallOutput;
 
-class WeatherTool extends AITool
+class TestTool extends AITool
 {
     public function __construct()
     {
-        $name = 'get_current_weather';
+        $name = 'get_test';
         $description = 'Get the current weather in a given location';
         $parameters = [
             'type' => 'object',
             'properties' => [
-                'location' => [
-                    'type' => 'string',
-                    'description' => 'The city and state, e.g. San Francisco, CA',
-                ],
-                'unit' => [
-                    'type' => 'string',
-                    'enum' => ['celsius', 'fahrenheit'],
-                    'default' => 'celsius',
-                ],
-            ],
-            'required' => ['location'],
+                'none' => 'no parameters'
+            ]
         ];
 
         parent::__construct($name, $description, $parameters);
@@ -35,7 +25,7 @@ class WeatherTool extends AITool
         $arguments = json_decode($toolCall->function->toArray()['arguments'], true);
 
         $result = [
-            'text' => sprintf("The temperature in %s is %d",$arguments['location'], rand(10, 30)),
+            'text' => sprintf("The temperature in %s is %d", $arguments['location'], rand(10, 30)),
         ];
 
         return ToolResultResponse::fromArray([

@@ -7,15 +7,19 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "guzzlehttp/guzzle": "^7.0",
         "nyholm/psr7": "^1.8",
         "openai-php/client": "^0.14.0",
+        "php-mcp/client": "^1.0",
+        "psr/http-message": "^1.0",
         "symfony/console": "7.3.*",
         "symfony/dotenv": "7.3.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.3.*",
         "symfony/http-client": "^7.3",
         "symfony/runtime": "7.3.*",
-        "symfony/yaml": "7.3.*"
+        "symfony/yaml": "7.3.*",
+        "ext-posix": "*"
     },
     "config": {
         "allow-plugins": {

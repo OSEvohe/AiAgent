@@ -5,6 +5,7 @@ namespace App\Model;
 use App\Model\IO\IOInterface;
 use App\Model\Tool\ToolsHandler;
 use App\Service\OpenAIServiceInterface;
+use Exception;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Responses\StreamResponse;
 
@@ -12,25 +13,40 @@ class Discussion
 {
     private ToolsHandler $toolsHandler;
 
+    private string $discussionID;
+
     public function __construct(
         private OpenAIServiceInterface $openAIService,
         private string $model,
         private IOInterface $io,
         private array $context = [],
         private array $tools = [],
-        private float $temperature = 0.8,
+        private array $mcps = [],
+        private float $temperature = 0.15,
         private int $max_output_tokens = 5000,
         private string $tool_choice = 'auto',
-        private bool $parallel_tool_calls = false,
+        private bool $parallel_tool_calls = true,
         private bool $store = true,
         private array $metadata = [],
     ) {
-        $this->toolsHandler = new ToolsHandler($this->tools, $this->io);
+        $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
+        $this->discussionID = uniqid('discussion_', true);
     }
 
     public function getContext(): array
     {
         return $this->context;
+    }
+
+    /**
+     * @param array $message
+     * @return void
+     */
+    public function addToContext(array $message = []): void
+    {
+        if (!empty($message)) {
+            $this->context[] = $message;
+        }
     }
 
     public function getTools(): array
@@ -43,51 +59,77 @@ class Discussion
         return new UserMessage($userInput);
     }
 
-    public function sendUserMessage(string $userInput): void
+    public function sendUserMessage(string $userInput): string
     {
-        $this->context[] = $this->createUserMessage($userInput)->toArray();
-        $this->processResponse();
+        try {
+            $this->context[] = $this->createUserMessage($userInput)->toArray();
+            return $this->processResponse();
+        } catch (Exception $e) {
+            return 'Error processing response: ' . $e->getMessage();
+        }
     }
 
     public function toArray(): array
     {
         return [
             'model' => $this->model,
-            'tools' => array_map(fn($tool) => $tool->toArray(), $this->tools),
+            'tools' => array_map(fn($tool) => $tool->toArray(), $this->toolsHandler->getTools()),
             'messages' => $this->context,
             'temperature' => $this->temperature,
-            'max_output_tokens' => $this->max_output_tokens,
             'tool_choice' => $this->tool_choice,
             'parallel_tool_calls' => $this->parallel_tool_calls,
-            'store' => $this->store,
-            'metadata' => $this->metadata,
         ];
     }
 
-    private function processResponse(): void
+    public function preparePrompt(string $prompt): string
+    {
+        // on crée une nouvelle Discussion.
+        $discussion = new Discussion(
+            openAIService: $this->openAIService,
+            model: $this->model,
+            io: $this->io,
+            tools: [],
+            mcps: [],
+            temperature: $this->temperature,
+            tool_choice: 'none',
+            parallel_tool_calls: false,
+        );
+
+        // on demande au LLM, de reformuler le prompt en anglais de manière à ce qu'il soit le plus clair possible
+        return $discussion->sendUserMessage("Please rewrite the following prompt in English to make it as clear as possible: \"" . $prompt . "\"");
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function processResponse(int $step = 0): string
     {
         $response = $this->processContext();
+        $responseContent = '';
 
         foreach ($response->choices as $choice) {
             $this->context[] = $choice->message->toArray();
+
             if ($choice->message->content) {
-                $this->io->output($choice->message->content);
+                $responseContent = $choice->message->content;
             }
 
             if ($choice->message->toolCalls) {
-                $toolsResult = $this->toolsHandler->handleToolCalls($choice->message->toolCalls);
-                array_push($this->context, ...array_map(fn($result) => $result->toArray(), $toolsResult));
-            }
-
-            if ($choice->finishReason !== 'stop') {
-                $this->processResponse();
+                $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
+                $this->context[] = $toolResult->toArray();
+                $responseContent = $this->processResponse($step + 1);
+                /*if ($step === 0) {
+                    $this->context[] = $this->createUserMessage('If task is not complete continue with the next step. If task is complete ask for further instructions. If you are unsure about the next step, please ask for clarification.')->toArray();
+                    $this->processResponse();
+                }*/
             }
         }
+
+        return $responseContent;
     }
 
-    private function processContext(): CreateResponse|StreamResponse
+    public function processContext(): CreateResponse|StreamResponse
     {
-        dump($this->toArray());
         return $this->openAIService->sendToLlm($this->toArray());
     }
 }
