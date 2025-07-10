@@ -45,13 +45,13 @@ class Discussion
         return new UserMessage($userInput);
     }
 
-    public function sendUserMessage(string $userInput): void
+    public function sendUserMessage(string $userInput): string
     {
         try {
             $this->context[] = $this->createUserMessage($userInput)->toArray();
-            $this->processResponse();
+            return $this->processResponse();
         } catch (Exception $e) {
-            $this->io->output('Error processing response: ' . $e->getMessage());
+            return 'Error processing response: ' . $e->getMessage();
         }
     }
 
@@ -62,26 +62,46 @@ class Discussion
             'tools' => array_map(fn($tool) => $tool->toArray(), $this->toolsHandler->getTools()),
             'messages' => $this->context,
             'temperature' => $this->temperature,
-            //'max_output_tokens' => $this->max_output_tokens,
             'tool_choice' => $this->tool_choice,
             'parallel_tool_calls' => $this->parallel_tool_calls,
-            //'store' => $this->store,
-            //'metadata' => $this->metadata,
         ];
+    }
+
+    public function preparePrompt(string $prompt): string
+    {
+        // on crée une nouvelle Discussion.
+        $discussion = new Discussion(
+            openAIService: $this->openAIService,
+            model: $this->model,
+            io: $this->io,
+            context: $this->context,
+            tools: $this->tools,
+            mcps: $this->mcps,
+            temperature: $this->temperature,
+            max_output_tokens: $this->max_output_tokens,
+            tool_choice: $this->tool_choice,
+            parallel_tool_calls: $this->parallel_tool_calls,
+            store: $this->store,
+            metadata: $this->metadata
+        );
+
+        // on demande au LLM, de reformuler le prompt en anglais de ma manière à ce qu'il soit le plus clair possible
+        return $discussion->sendUserMessage("Please rephrase the following prompt in English to make it as clear as possible: " . $prompt);
     }
 
     /**
      * @throws Exception
      */
-    private function processResponse(int $step = 0): void
+    public function processResponse(int $step = 0): string
     {
         $response = $this->processContext();
+        $responseContent = '';
 
         foreach ($response->choices as $choice) {
             $this->context[] = $choice->message->toArray();
 
             if ($choice->message->content) {
-                $this->io->output($choice->message->content);
+                $responseContent = $choice->message->content;
             }
 
             if ($choice->message->toolCalls) {
@@ -95,9 +115,10 @@ class Discussion
             }
         }
 
+        return $responseContent;
     }
 
-    private function processContext(): CreateResponse|StreamResponse
+    public function processContext(): CreateResponse|StreamResponse
     {
         return $this->openAIService->sendToLlm($this->toArray());
     }

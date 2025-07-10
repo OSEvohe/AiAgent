@@ -43,7 +43,9 @@ class BasicAgentCommand extends Command
             mcps: [new Jetbrains()],
         );
 
-        $discussion->sendUserMessage($prompt);
+        $preparedPrompt = $discussion->preparePrompt($prompt);
+
+        $io->writeln($discussion->sendUserMessage($preparedPrompt));
 
         //dump($discussion->getContext());
 

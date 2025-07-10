@@ -10,6 +10,9 @@ use OpenAI\Responses\Chat\CreateResponseToolCall;
 
 class ToolsHandler
 {
+    private bool $toolsEnabled = true;
+
+
     public function __construct(
         /** @var AITool[] */
         private array $tools = [],
@@ -62,6 +65,16 @@ class ToolsHandler
 
     public function getTools(): array
     {
-        return $this->tools;
+        return $this->toolsEnabled ? $this->tools : [];
+    }
+
+    public function disableTools(): void
+    {
+        $this->toolsEnabled = false;
+    }
+
+    public function enableTools(): void
+    {
+        $this->toolsEnabled = true;
     }
 }
