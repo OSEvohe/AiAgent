@@ -2,9 +2,9 @@
 
 namespace App\Model\Agent;
 
-use App\Model\MCP\McpClient;
+use App\Model\Agent;
 
-class ChatAgent implements Agent
+class ChatAgent
 {
     public function getName(): string
     {

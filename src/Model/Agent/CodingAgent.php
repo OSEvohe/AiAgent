@@ -2,10 +2,11 @@
 
 namespace App\Model\Agent;
 
+use App\Model\Agent;
 use App\Model\MCP\McpClient;
 use Exception;
 
-class CodingAgent implements Agent
+class CodingAgent
 {
     private string $mcpJsonConfig;
 

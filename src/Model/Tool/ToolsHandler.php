@@ -56,7 +56,11 @@ class ToolsHandler
     ): ToolResultResponse {
         foreach ($this->tools as $tool) {
             if ($tool->getName() === $toolCall->function->name) {
-                $this->io?->output("Running tool: {$tool->getName()} with arguments: {$toolCall->function->arguments}");
+                if ($tool instanceof AgentTool) {
+                    $this->io?->output("Running Agent: {$tool->getName()} with task:  {$toolCall->function->arguments}");
+                } else {
+                    $this->io?->output("Running tool: {$tool->getName()}");
+                }
                 return $tool->execute($toolCall);
             }
         }

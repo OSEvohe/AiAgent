@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-use App\Model\Agent\Agent;
-use App\Model\Agent\ChatAgent;
 use App\Model\IO\IOInterface;
 use App\Model\Tool\ToolsHandler;
 use App\Service\OpenAIServiceInterface;
@@ -11,16 +9,17 @@ use Exception;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Responses\StreamResponse;
 
-class Discussion
+class Agent
 {
     private ToolsHandler $toolsHandler;
 
-    private string $discussionID;
+    private string $agentId;
 
     public function __construct(
         private OpenAIServiceInterface $openAIService,
         private string $model,
-        private Agent $agent,
+        private array $tools = [],
+        private array $mcps = [],
         private IOInterface $io,
         private array $context = [],
         private float $temperature = 0.15,
@@ -30,8 +29,8 @@ class Discussion
         private bool $store = true,
         private array $metadata = [],
     ) {
-        $this->toolsHandler = new ToolsHandler($this->agent->getTools(), $this->agent->getMcps(), $this->io);
-        $this->discussionID = uniqid('discussion_', true);
+        $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
+        $this->agentId = uniqid('agent_', true);
     }
 
     public function getContext(): array
@@ -80,23 +79,6 @@ class Discussion
             'tool_choice' => $this->tool_choice,
             'parallel_tool_calls' => $this->parallel_tool_calls,
         ];
-    }
-
-    public function preparePrompt(string $prompt): string
-    {
-        // on crée une nouvelle Discussion.
-        $discussion = new Discussion(
-            openAIService: $this->openAIService,
-            model: $this->model,
-            agent: new ChatAgent(), // on utilise un agent de type ChatAgent pour reformuler le prompt
-            io: $this->io,
-            temperature: $this->temperature,
-            tool_choice: 'none',
-            parallel_tool_calls: false,
-        );
-
-        // on demande au LLM, de reformuler le prompt en anglais de manière à ce qu'il soit le plus clair possible
-        return $discussion->sendUserMessage("Please rewrite the following prompt in English to make it as clear as possible: \"" . $prompt . "\"");
     }
 
     /**

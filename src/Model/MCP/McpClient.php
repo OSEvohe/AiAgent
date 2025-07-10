@@ -2,6 +2,7 @@
 
 namespace App\Model\MCP;
 
+use Exception;
 use PhpMcp\Client\Client;
 use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\JsonRpc\Results\CallToolResult;
@@ -36,9 +37,12 @@ class McpClient
         }
     }
 
-    public static function fromJsonConfig(string $jsonConfig): array
+    /**
+     * @throws Exception
+     */
+    public static function fromJsonConfig(string $filePath): array
     {
-        $jsonConfig = json_decode($jsonConfig, true);
+        $jsonConfig = json_decode(self::loadJsonConfig($filePath), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException('Invalid JSON configuration: ' . json_last_error_msg());
@@ -62,6 +66,23 @@ class McpClient
         }
 
         return $mcpServers;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private static function loadJsonConfig(string $filePath): string
+    {
+        if (!file_exists($filePath)) {
+            throw new Exception("Configuration file does not exist: $filePath");
+        }
+
+        $jsonContent = file_get_contents($filePath);
+        if ($jsonContent === false) {
+            throw new Exception("Failed to read configuration file: $filePath");
+        }
+
+        return $jsonContent;
     }
 
     /**

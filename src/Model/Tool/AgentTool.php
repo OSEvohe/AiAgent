@@ -2,27 +2,23 @@
 
 namespace App\Model\Tool;
 
-use App\Model\Agent\Agent;
-use App\Model\Discussion;
+use App\Model\Agent;
 use App\Model\IO\IOInterface;
-
-use App\Service\OpenAIService;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
 
 class AgentTool extends AITool
 {
-    private Discussion $discussion;
-
     /**
      * AgentTool constructor.
      * @param IOInterface $output
+     * @param Agent $agent
      * @param string $agentName
      * @param string $description
      * @param array $tools
      * @param array $mcps
      * @param string $systemMessage
      */
-    public function __construct(IOInterface $output, Agent $agent, string $agentName = 'TaskAgent', string $description = 'use an AI agent to perform a task', array $tools = [], array $mcps = [], string $systemMessage = '')
+    public function __construct(IOInterface $output, private readonly Agent $agent, string $agentName = 'TaskAgent', string $description = 'you can use this agent to perform a task', array $tools = [], array $mcps = [], string $systemMessage = '')
     {
         $name = $agentName . 'Tool';
         $parameters = [
@@ -33,16 +29,9 @@ class AgentTool extends AITool
             'required' => ['task']
         ];
 
-        $this->discussion = new Discussion(
-            openAIService: new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']),
-            model: '',
-            agent: $agent,
-            io: $output,
-
-        );
 
         if (!empty($systemMessage)) {
-            $this->discussion->addToContext($this->discussion->createUserMessage($systemMessage)->toArray());
+            $this->agent->addToContext($this->agent->createUserMessage($systemMessage)->toArray());
         }
 
         parent::__construct($name, $description, $parameters);
@@ -58,7 +47,7 @@ class AgentTool extends AITool
         $arguments = json_decode($toolCall->function->toArray()['arguments'], true);
         $task = $arguments['task'];
 
-        $completedTask = $this->discussion->sendUserMessage($task);
+        $completedTask = $this->agent->sendUserMessage($task);
 
         $result = [
             'result' => sprintf('%s', $completedTask),

@@ -2,12 +2,13 @@
 
 namespace App\Model\Agent;
 
+use App\Model\Agent;
 use App\Model\IO\IOInterface;
 use App\Model\MCP\McpClient;
 use App\Model\Tool\AgentTool;
 use Exception;
 
-class OrchestrateAgent implements Agent
+class OrchestrateAgent
 {
     private string $mcpJsonConfig;
 

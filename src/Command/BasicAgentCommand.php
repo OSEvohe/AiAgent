@@ -2,13 +2,8 @@
 
 namespace App\Command;
 
-use App\Model\Agent\CodingAgent;
-use App\Model\Agent\OrchestrateAgent;
-use App\Model\Discussion;
 use App\Model\IO\Terminal;
-use App\Model\MCP\Jetbrains;
-use App\Model\Tool\AgentTool;
-use App\Service\OpenAIService;
+use App\Model\Team\CodingTeam;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,13 +17,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class BasicAgentCommand extends Command
 {
+    public function __construct(private readonly CodingTeam $codingTeam)
+    {
+        parent::__construct();
+    }
+
+
     /**
      * Configure the command
      */
     protected function configure(): void
     {
-        $this
-            ->addArgument('input', InputArgument::OPTIONAL, 'Text Input sent to LLM');
+        $this->addArgument('input', InputArgument::OPTIONAL, 'Text Input sent to LLM');
     }
 
     /**
@@ -48,18 +48,15 @@ class BasicAgentCommand extends Command
             return Command::FAILURE;
         }
 
-        $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
+        try {
+            $this->codingTeam->initialize(new Terminal($io));
+            $io->writeln($this->codingTeam->sendMessage($prompt));
+        } catch (\Exception $e) {
+            $io->error('Error: ' . $e->getMessage());
+            return Command::FAILURE;
+        }
 
-        $discussion = new Discussion(
-            openAIService: $aiService,
-            model: '',
-            agent: new OrchestrateAgent([new CodingAgent()], new Terminal($output)),
-            io: new Terminal($output),
-        );
-
-        $preparedPrompt = $discussion->preparePrompt($prompt);
-
-        $io->writeln($discussion->sendUserMessage($preparedPrompt));
+        dump($this->codingTeam->getContext());
 
         return Command::SUCCESS;
     }
