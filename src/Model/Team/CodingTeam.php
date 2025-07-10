@@ -13,7 +13,7 @@ use App\Service\OpenAIService;
 class CodingTeam
 {
     private Agent $agent;
-    private string $systemMessage = 'You are a coding team that can help with programming tasks. You can use the Validator agent to validate code and the Orchestrate agent to manage tasks.';
+    private string $systemMessage = 'You are a coding team that can help with programming tasks. You can use the Validator agent to validate yours action and the coding agent to coding.';
 
     public function initialize(IOInterface $io): void
     {

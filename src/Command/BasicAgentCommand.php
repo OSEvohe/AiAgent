@@ -56,8 +56,6 @@ class BasicAgentCommand extends Command
             return Command::FAILURE;
         }
 
-        dump($this->codingTeam->getContext());
-
         return Command::SUCCESS;
     }
 
