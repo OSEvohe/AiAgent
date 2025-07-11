@@ -39,7 +39,7 @@ class CodingTeam
             openAIService: $aiService,
             model: '',
             tools: [
-                new AgentTool($io, $validator, 'Validator', 'This agent can perform search tasks on internet'),
+                new AgentTool($io, $validator, 'Validator', 'This agent can validate actions and decisions'),
                 new AgentTool($io, $codingAgent, 'CodingAgent', 'This agent can perform coding tasks'),
             ],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/orchestrate_agent.json'),
@@ -60,7 +60,7 @@ class CodingTeam
         if (!isset($this->agent)) {
             throw new \Exception('Agent not initialized. Please call initialize() first.');
         }
-        $this->agent->addToContext((new SystemMessage($this->systemMessage))->toArray());
+        //$this->agent->addToContext((new SystemMessage($this->systemMessage))->toArray());
         return $this->agent->sendUserMessage($message);
     }
 
