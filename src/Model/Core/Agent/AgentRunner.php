@@ -23,6 +23,7 @@ class AgentRunner
         private array $tools = [],
         private array $mcps = [],
         private IOInterface $io,
+        private string $agentName = '',
         private array $context = [],
         private float $temperature = 0.15,
         private int $max_output_tokens = 5000,
@@ -32,7 +33,11 @@ class AgentRunner
         private array $metadata = [],
     ) {
         $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
-        $this->agentId = uniqid('agent_', true);
+        $this->agentId = uniqid();
+
+        if (empty($this->agentName)){
+            $this->agentName = 'Agent_' . $this->agentId;
+        }
 
         // Ensure the system message is always the first message in the context,
         // unless the context already starts with a system message.
@@ -105,6 +110,8 @@ class AgentRunner
 
             if ($choice->message->content) {
                 $responseContent = $choice->message->content;
+                $this->io->output($this->agentName.': '.$responseContent);
+
             }
 
             if ($choice->message->toolCalls) {

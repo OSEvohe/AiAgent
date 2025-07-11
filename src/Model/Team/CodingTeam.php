@@ -113,6 +113,7 @@ class CodingTeam implements Team
             tools: [],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/validator_agent.json'),
             io: $io,
+            agentName: 'Validator',
         );
 
         $codingAgent = new AgentRunner(
@@ -122,6 +123,7 @@ class CodingTeam implements Team
             tools: [],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/coding_agent.json'),
             io: $io,
+            agentName: 'CodingAgent',
         );
 
         $this->agent = new AgentRunner(
@@ -134,6 +136,7 @@ class CodingTeam implements Team
             ],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/orchestrate_agent.json'),
             io: $io,
+            agentName: 'Orchestrator',
         );
     }
 }
