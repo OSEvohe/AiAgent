@@ -18,12 +18,12 @@ class AgentRunner
 
     public function __construct(
         private OpenAIServiceInterface $openAIService,
-        private string $model,
+        private string $agentName = '',
+        private string $model = '', // Will use the default model if not specified
         private string $systemMessage = 'You are an agent that can help with various tasks. Use the tools provided to assist in completing tasks.',
         private array $tools = [],
         private array $mcps = [],
-        private IOInterface $io,
-        private string $agentName = '',
+        private ?IOInterface $io = null,
         private array $context = [],
         private float $temperature = 0.15,
         private int $max_output_tokens = 5000,
@@ -31,6 +31,7 @@ class AgentRunner
         private bool $parallel_tool_calls = true,
         private bool $store = true,
         private array $metadata = [],
+        private ?AgentRunner $prePromptProcessor = null,
     ) {
         $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
         $this->agentId = uniqid();
@@ -78,6 +79,10 @@ class AgentRunner
     public function sendUserMessage(string $userInput): string
     {
         try {
+            if ($this->prePromptProcessor) {
+                $userInput = $this->prePromptProcessor->sendUserMessage($userInput);
+            }
+
             $this->context[] = $this->createUserMessage($userInput)->toArray();
             return $this->processResponse();
         } catch (Exception $e) {
@@ -110,7 +115,7 @@ class AgentRunner
 
             if ($choice->message->content) {
                 $responseContent = $choice->message->content;
-                $this->io->output($this->agentName.': '.$responseContent);
+                $this->io?->output($this->agentName.': '.$responseContent);
 
             }
 

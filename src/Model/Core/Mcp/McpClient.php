@@ -39,7 +39,7 @@ class McpClient
                 throw new \RuntimeException('Failed to connect to MCP server: ' . $e->getMessage());
             }
 
-            McpsPool::addMcp($this->name);
+            McpsPool::addMcp(name: $this->name, client: $this->client);
         }
     }
 

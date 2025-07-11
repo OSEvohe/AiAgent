@@ -40,7 +40,7 @@ class BasicChatCommand extends Command
                 continue;
             }
 
-            $io->writeln($this->codingTeam->sendMessage($prompt));
+            $this->codingTeam->sendMessage($prompt);
         }
 
         return Command::SUCCESS;

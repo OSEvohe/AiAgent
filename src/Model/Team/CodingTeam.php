@@ -104,29 +104,36 @@ class CodingTeam implements Team
         VALIDATOR;
 
 
+        $promptPreProcessor = new AgentRunner(
+            openAIService: $aiService,
+            systemMessage: "You are a prompt pre-processor that prepares the user message. Your task is to ensure the user message is clear, concise, in english and ready for use by an agent. You will not perform any actions or decisions, just prepare the message.",
+            io: null,
+        );
+
 
         $validator = new AgentRunner(
             openAIService: $aiService,
+            agentName: 'Validator',
             model: '',
             systemMessage: $validatorSystemMessage,
             tools: [],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/validator_agent.json'),
             io: $io,
-            agentName: 'Validator',
         );
 
         $codingAgent = new AgentRunner(
             openAIService: $aiService,
+            agentName: 'CodingAgent',
             model: '',
             systemMessage: $codingAgentSystemMessage,
             tools: [],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/coding_agent.json'),
             io: $io,
-            agentName: 'CodingAgent',
         );
 
         $this->agent = new AgentRunner(
             openAIService: $aiService,
+            agentName: 'Orchestrator',
             model: '',
             systemMessage: $masterSystemMessage,
             tools: [
@@ -135,7 +142,7 @@ class CodingTeam implements Team
             ],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/orchestrate_agent.json'),
             io: $io,
-            agentName: 'Orchestrator',
+            prePromptProcessor: $promptPreProcessor,
         );
     }
 }
