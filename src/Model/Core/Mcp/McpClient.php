@@ -20,20 +20,26 @@ class McpClient
      */
     private function __construct(ServerConfig $serverConfig, private readonly string $name, private readonly string $version = '1.0', private readonly array $excludedTools = [])
     {
-        dump('Connecting to MCP server: ' . $this->getClientName() . ' v' . $this->getClientVersion());
+        if (McpsPool::hasMcp($this->name)) {
+            $this->client = McpsPool::getMcp($this->name);
+        } else {
+            dump('Connecting to MCP server: ' . $this->getClientName());
 
-        $clientCapabilities = ClientCapabilities::forClient(); // Default client caps
+            $clientCapabilities = ClientCapabilities::forClient(); // Default client caps
 
-        $this->client = Client::make()
-            ->withClientInfo($name, $version)
-            ->withCapabilities($clientCapabilities)
-            ->withServerConfig($serverConfig)
-            ->build();
+            $this->client = Client::make()
+                ->withClientInfo($name, $version)
+                ->withCapabilities($clientCapabilities)
+                ->withServerConfig($serverConfig)
+                ->build();
 
-        try {
-            $this->client->initialize();
-        } catch (Throwable $e) {
-            throw new \RuntimeException('Failed to connect to MCP server: ' . $e->getMessage());
+            try {
+                $this->client->initialize();
+            } catch (Throwable $e) {
+                throw new \RuntimeException('Failed to connect to MCP server: ' . $e->getMessage());
+            }
+
+            McpsPool::addMcp($this->name);
         }
     }
 

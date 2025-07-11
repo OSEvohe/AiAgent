@@ -10,4 +10,4 @@
 /vendor/
 ###< symfony/framework-bundle ###
 /config/agents/extensions/
-/src/Model/
+/src/Model/Extensions/
