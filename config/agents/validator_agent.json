@@ -6,6 +6,28 @@
                 "-y",
                 "@upstash/context7-mcp"
             ]
+        },
+        "jetbrains": {
+            "command": "npx",
+            "args": ["-y", "@jetbrains/mcp-proxy"],
+            "included_tools": [
+                "find_commit_by_message",
+                "find_files_by_name_substring",
+                "get_file_text_by_path",
+                "get_project_vcs_status",
+                "open_file_in_editor",
+                "get_current_file_errors",
+                "get_project_problems",
+                "execute_terminal_command",
+                "find_commit_by_message"
+            ]
+        },
+        "sequential-thinking": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-sequential-thinking"
+            ]
         }
     }
 }

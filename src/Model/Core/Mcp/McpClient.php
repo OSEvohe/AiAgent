@@ -18,8 +18,13 @@ class McpClient
     /**
      * @throws \RuntimeException
      */
-    private function __construct(ServerConfig $serverConfig, private readonly string $name, private readonly string $version = '1.0', private readonly array $excludedTools = [])
-    {
+    private function __construct(
+        ServerConfig $serverConfig,
+        private readonly string $name,
+        private readonly string $version = '1.0',
+        private readonly array $includedTools = [],
+        private readonly array $excludedTools = []
+    ) {
         if (McpsPool::hasMcp($this->name)) {
             $this->client = McpsPool::getMcp($this->name);
         } else {
@@ -68,27 +73,15 @@ class McpClient
                 timeout: $server['timeout'] ?? 600
             );
 
-            $mcpServers[] = new self(serverConfig: $serverConfig, name: $serverName, excludedTools: $server['excluded_tools'] ?? []);
+            $mcpServers[] = new self(
+                serverConfig: $serverConfig,
+                name: $serverName,
+                includedTools: $server['included_tools'] ?? [],
+                excludedTools: $server['excluded_tools'] ?? []
+            );
         }
 
         return $mcpServers;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private static function loadJsonConfig(string $filePath): string
-    {
-        if (!file_exists($filePath)) {
-            throw new Exception("Configuration file does not exist: $filePath");
-        }
-
-        $jsonContent = file_get_contents($filePath);
-        if ($jsonContent === false) {
-            throw new Exception("Failed to read configuration file: $filePath");
-        }
-
-        return $jsonContent;
     }
 
     /**
@@ -99,7 +92,7 @@ class McpClient
         try {
             $list = [];
             foreach ($this->client->listTools() as $tool) {
-                if (!in_array($tool->name, $this->excludedTools)) {
+                if (!in_array($tool->name, $this->excludedTools) && (in_array($tool->name, $this->includedTools) || empty($this->includedTools))) {
                     $list[] = $tool;
                 }
             }
@@ -125,6 +118,23 @@ class McpClient
         } catch (Throwable $e) {
             throw new \RuntimeException('Failed to call tool: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private static function loadJsonConfig(string $filePath): string
+    {
+        if (!file_exists($filePath)) {
+            throw new Exception("Configuration file does not exist: $filePath");
+        }
+
+        $jsonContent = file_get_contents($filePath);
+        if ($jsonContent === false) {
+            throw new Exception("Failed to read configuration file: $filePath");
+        }
+
+        return $jsonContent;
     }
 
     static protected function createServerConfig(string $name, string $command, array $args, TransportType $transport = TransportType::Stdio, int $timeout = 600): ServerConfig

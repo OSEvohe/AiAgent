@@ -31,7 +31,7 @@ class CodingTeam implements Team
         Available tools:
         - sequential-thinking: Use this to plan and structure your approach step by step
         - CodingAgent: Implements code based on your specifications
-         - Validator: Validates code quality, functionality, and compliance
+        - Validator: Validates code quality, functionality, and compliance
 
         Workflow process:
         1. Receive and analyze the coding request
@@ -46,6 +46,7 @@ class CodingTeam implements Team
         - Provide context and requirements for each coding task
         - Coordinate feedback loops between agents
         - Keep track of project progress and requirements fulfillment
+        - If you unsure you can ask your agent tools what they can do with their tools.
         MASTER;
 
         $codingAgentSystemMessage = <<< CODING
@@ -106,7 +107,7 @@ class CodingTeam implements Team
 
         $promptPreProcessor = new AgentRunner(
             openAIService: $aiService,
-            systemMessage: "You are a prompt pre-processor that prepares the user message. Your task is to ensure the user message is clear, concise, in english and ready for use by an agent. You will not perform any actions or decisions, just prepare the message.",
+            systemMessage: "You are a prompt preprocessor, your role is to prepare an output by rewriting the user message in english and removing any unnecessary information, you need to provide a clean and clear message so another AI can process it.",
             io: null,
         );
 
@@ -128,7 +129,7 @@ class CodingTeam implements Team
             systemMessage: $codingAgentSystemMessage,
             tools: [],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/coding_agent.json'),
-            io: $io,
+            io: null,
         );
 
         $this->agent = new AgentRunner(
@@ -137,8 +138,8 @@ class CodingTeam implements Team
             model: '',
             systemMessage: $masterSystemMessage,
             tools: [
-                new AgentTool($io, $validator, 'Validator', 'This agent can validate actions and decisions'),
-                new AgentTool($io, $codingAgent, 'CodingAgent', 'This agent can perform coding tasks'),
+                new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
+                new AgentTool($io, $codingAgent, 'coding_agent_tool', 'this agent as too can read, write, modify or create any code files, this is your primary tool for coding tasks'),
             ],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/orchestrate_agent.json'),
             io: $io,

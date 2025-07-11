@@ -80,7 +80,7 @@ class AgentRunner
     {
         try {
             if ($this->prePromptProcessor) {
-                $userInput = $this->prePromptProcessor->sendUserMessage($userInput);
+                $userInput = $this->prePromptProcessor->sendUserMessage("prepare this message: " . $userInput);
             }
 
             $this->context[] = $this->createUserMessage($userInput)->toArray();
