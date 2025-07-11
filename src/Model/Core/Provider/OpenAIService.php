@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Model\Core\Provider;
 
 use OpenAI;
 use OpenAI\Client;

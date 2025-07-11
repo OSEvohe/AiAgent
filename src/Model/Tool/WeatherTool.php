@@ -2,9 +2,14 @@
 
 namespace App\Model\Tool;
 
+use App\Model\Core\Message\ToolResultResponse;
+use App\Model\Core\Tool\AITool;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
-use OpenAI\Responses\Responses\Input\FunctionToolCallOutput;
 
+/**
+ * WeatherTool class to get the current weather in a given location.
+ * This tool simulates fetching weather data and returns a random temperature.
+ */
 class WeatherTool extends AITool
 {
     public function __construct()

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Model\Tool;
+namespace App\Model\Core\Tool;
 
-use App\Model\Agent;
-use App\Model\IO\IOInterface;
+use App\Model\Core\Agent\AgentRunner;
+use App\Model\Core\IOInterface;
+use App\Model\Core\Message\ToolResultResponse;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
 
 class AgentTool extends AITool
@@ -11,14 +12,14 @@ class AgentTool extends AITool
     /**
      * AgentTool constructor.
      * @param IOInterface $output
-     * @param Agent $agent
+     * @param AgentRunner $agent
      * @param string $agentName
      * @param string $description
      * @param array $tools
      * @param array $mcps
      * @param string $systemMessage
      */
-    public function __construct(IOInterface $output, private readonly Agent $agent, string $agentName = 'TaskAgent', string $description = 'you can use this agent to perform a task', array $tools = [], array $mcps = [], string $systemMessage = '')
+    public function __construct(IOInterface $output, private readonly AgentRunner $agent, string $agentName = 'TaskAgent', string $description = 'you can use this agent to perform a task', array $tools = [], array $mcps = [], string $systemMessage = '')
     {
         $name = $agentName . 'Tool';
         $parameters = [

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\MCP;
+namespace App\Model\Core\Mcp;
 
 use Exception;
 use PhpMcp\Client\Client;

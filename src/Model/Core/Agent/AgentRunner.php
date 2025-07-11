@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Core\Agent;
 
-use App\Model\IO\IOInterface;
-use App\Model\Tool\ToolsHandler;
-use App\Service\OpenAIServiceInterface;
+use App\Model\Core\IOInterface;
+use App\Model\Core\Message\UserMessage;
+use App\Model\Core\Provider\OpenAIServiceInterface;
+use App\Model\Core\Tool\ToolsHandler;
 use Exception;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Responses\StreamResponse;
 
-class Agent
+class AgentRunner
 {
     private ToolsHandler $toolsHandler;
 
@@ -18,6 +19,7 @@ class Agent
     public function __construct(
         private OpenAIServiceInterface $openAIService,
         private string $model,
+        private string $systemMessage = 'You are an agent that can help with various tasks. Use the tools provided to assist in completing tasks.',
         private array $tools = [],
         private array $mcps = [],
         private IOInterface $io,
@@ -31,6 +33,15 @@ class Agent
     ) {
         $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
         $this->agentId = uniqid('agent_', true);
+
+        // Ensure the system message is always the first message in the context,
+        // unless the context already starts with a system message.
+        if (!empty($this->context) && $this->context[0]['role'] !== 'system') {
+            $this->context = array_merge([['role' => 'system', 'content' => $this->systemMessage]], $this->context);
+        } elseif (empty($this->context)) {
+            $this->context[] = ['role' => 'system', 'content' => $this->systemMessage];
+        }
+
     }
 
     public function getContext(): array

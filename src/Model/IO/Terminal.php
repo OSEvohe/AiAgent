@@ -2,8 +2,7 @@
 
 namespace App\Model\IO;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use App\Model\Core\IOInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 readonly class Terminal implements IOInterface

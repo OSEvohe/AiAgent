@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Model\Tool;
+namespace App\Model\Core\Tool;
 
+use App\Model\Core\Message\ToolResultResponse;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
-use OpenAI\Responses\Responses\Input\FunctionToolCallOutput;
 
 abstract class AITool
 {

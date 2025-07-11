@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Model\Tool;
+namespace App\Model\Core\Tool;
 
-use App\Model\IO\IOInterface;
-use App\Model\MCP\McpClient;
-use App\Model\MCP\McpTool;
+use App\Model\Core\IOInterface;
+use App\Model\Core\Mcp\McpClient;
+use App\Model\Core\Mcp\McpTool;
+use App\Model\Core\Message\ToolResultResponse;
 use Exception;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
 
@@ -57,7 +58,7 @@ class ToolsHandler
         foreach ($this->tools as $tool) {
             if ($tool->getName() === $toolCall->function->name) {
                 if ($tool instanceof AgentTool) {
-                    $this->io?->output("Running Agent: {$tool->getName()} with task:  {$toolCall->function->arguments}");
+                    $this->io?->output("Running AgentRunner: {$tool->getName()} with task:  {$toolCall->function->arguments}");
                 } else {
                     $this->io?->output("Running tool: {$tool->getName()}");
                 }
