@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Model\MCP;
+namespace App\Model\Core\Mcp;
 
-use App\Model\Tool\AITool;
-use App\Model\Tool\ToolResultResponse;
+use App\Model\Core\Message\ToolResultResponse;
+use App\Model\Core\Tool\AITool;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
-use PhpMcp\Client\Client;
 use PhpMcp\Client\Model\Definitions\ToolDefinition;
 use Throwable;
 
 class McpTool extends AITool
 {
-    public function __construct(ToolDefinition $tool, private readonly MCPClient $server)
+    public function __construct(ToolDefinition $tool, private readonly McpClient $server)
     {
         parent::__construct(
             name: $tool->name,

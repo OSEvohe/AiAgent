@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Tool;
+namespace App\Model\Core\Message;
 
 class ToolResultResponse
 {

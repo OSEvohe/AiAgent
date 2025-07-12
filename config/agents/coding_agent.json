@@ -1,0 +1,31 @@
+{
+    "mcpServers": {
+        "jetbrains": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@jetbrains/mcp-proxy"
+            ],
+            "included_tools": [
+                "create_new_file_with_text",
+                "find_files_by_name_substring",
+                "get_file_text_by_path",
+                "replace_file_text_by_path",
+                "replace_specific_text",
+                "list_files_in_folder",
+                "list_directory_tree_in_folder",
+                "search_in_files_content",
+                "execute_terminal_command"
+            ],
+            "excluded_tools": [
+            ]
+        },
+        "sequential-thinking": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-sequential-thinking"
+            ]
+        }
+    }
+}

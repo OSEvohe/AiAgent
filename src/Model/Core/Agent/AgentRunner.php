@@ -1,36 +1,53 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Core\Agent;
 
-use App\Model\IO\IOInterface;
-use App\Model\Tool\ToolsHandler;
-use App\Service\OpenAIServiceInterface;
+use App\Model\Core\IOInterface;
+use App\Model\Core\Message\UserMessage;
+use App\Model\Core\Provider\OpenAIServiceInterface;
+use App\Model\Core\Tool\ToolsHandler;
 use Exception;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Responses\StreamResponse;
 
-class Discussion
+class AgentRunner
 {
     private ToolsHandler $toolsHandler;
 
-    private string $discussionID;
+    private string $agentId;
 
     public function __construct(
         private OpenAIServiceInterface $openAIService,
-        private string $model,
-        private IOInterface $io,
-        private array $context = [],
+        private string $agentName = '',
+        private string $model = '', // Will use the default model if not specified
+        private string $systemMessage = 'You are an agent that can help with various tasks. Use the tools provided to assist in completing tasks.',
         private array $tools = [],
         private array $mcps = [],
+        private ?IOInterface $io = null,
+        private array $context = [],
         private float $temperature = 0.15,
         private int $max_output_tokens = 5000,
         private string $tool_choice = 'auto',
         private bool $parallel_tool_calls = true,
         private bool $store = true,
         private array $metadata = [],
+        private ?AgentRunner $prePromptProcessor = null,
     ) {
         $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
-        $this->discussionID = uniqid('discussion_', true);
+        $this->agentId = uniqid();
+
+        if (empty($this->agentName)){
+            $this->agentName = 'Agent_' . $this->agentId;
+        }
+
+        // Ensure the system message is always the first message in the context,
+        // unless the context already starts with a system message.
+        if (!empty($this->context) && $this->context[0]['role'] !== 'system') {
+            $this->context = array_merge([['role' => 'system', 'content' => $this->systemMessage]], $this->context);
+        } elseif (empty($this->context)) {
+            $this->context[] = ['role' => 'system', 'content' => $this->systemMessage];
+        }
+
     }
 
     public function getContext(): array
@@ -62,6 +79,10 @@ class Discussion
     public function sendUserMessage(string $userInput): string
     {
         try {
+            if ($this->prePromptProcessor) {
+                $userInput = $this->prePromptProcessor->sendUserMessage("prepare this message: " . $userInput);
+            }
+
             $this->context[] = $this->createUserMessage($userInput)->toArray();
             return $this->processResponse();
         } catch (Exception $e) {
@@ -81,24 +102,6 @@ class Discussion
         ];
     }
 
-    public function preparePrompt(string $prompt): string
-    {
-        // on crée une nouvelle Discussion.
-        $discussion = new Discussion(
-            openAIService: $this->openAIService,
-            model: $this->model,
-            io: $this->io,
-            tools: [],
-            mcps: [],
-            temperature: $this->temperature,
-            tool_choice: 'none',
-            parallel_tool_calls: false,
-        );
-
-        // on demande au LLM, de reformuler le prompt en anglais de manière à ce qu'il soit le plus clair possible
-        return $discussion->sendUserMessage("Please rewrite the following prompt in English to make it as clear as possible: \"" . $prompt . "\"");
-    }
-
     /**
      * @throws Exception
      */
@@ -112,6 +115,8 @@ class Discussion
 
             if ($choice->message->content) {
                 $responseContent = $choice->message->content;
+                $this->io?->output($this->agentName.': '.$responseContent);
+
             }
 
             if ($choice->message->toolCalls) {

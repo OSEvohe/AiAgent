@@ -1,26 +1,25 @@
 <?php
 
-namespace App\Model\Tool;
+namespace App\Model\Core\Tool;
 
-use App\Model\Discussion;
-use App\Model\IO\IOInterface;
-
-use App\Service\OpenAIService;
+use App\Model\Core\Agent\AgentRunner;
+use App\Model\Core\IOInterface;
+use App\Model\Core\Message\ToolResultResponse;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
 
-class TaskAgentTool extends AITool
+class AgentTool extends AITool
 {
-    private Discussion $discussion;
-
     /**
-     * TaskAgentTool constructor.
+     * AgentTool constructor.
      * @param IOInterface $output
+     * @param AgentRunner $agent
      * @param string $agentName
+     * @param string $description
      * @param array $tools
      * @param array $mcps
      * @param string $systemMessage
      */
-    public function __construct(IOInterface $output, string $agentName = 'TaskAgent', string $description = 'use an AI agent to perform a task', array $tools = [], array $mcps = [], string $systemMessage = '')
+    public function __construct(IOInterface $output, private readonly AgentRunner $agent, string $agentName = 'TaskAgent', string $description = 'you can use this agent to perform a task', array $tools = [], array $mcps = [], string $systemMessage = '')
     {
         $name = $agentName . 'Tool';
         $parameters = [
@@ -31,16 +30,9 @@ class TaskAgentTool extends AITool
             'required' => ['task']
         ];
 
-        $this->discussion = new Discussion(
-            openAIService: new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']),
-            model: '',
-            io: $output,
-            tools: $tools,
-            mcps: $mcps,
-        );
 
         if (!empty($systemMessage)) {
-            $this->discussion->addToContext($this->discussion->createUserMessage($systemMessage)->toArray());
+            $this->agent->addToContext($this->agent->createUserMessage($systemMessage)->toArray());
         }
 
         parent::__construct($name, $description, $parameters);
@@ -56,7 +48,7 @@ class TaskAgentTool extends AITool
         $arguments = json_decode($toolCall->function->toArray()['arguments'], true);
         $task = $arguments['task'];
 
-        $completedTask = $this->discussion->sendUserMessage($task);
+        $completedTask = $this->agent->sendUserMessage($task);
 
         $result = [
             'result' => sprintf('%s', $completedTask),

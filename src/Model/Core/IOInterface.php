@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\IO;
+namespace App\Model\Core;
 
 interface IOInterface
 {
