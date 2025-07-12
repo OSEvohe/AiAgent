@@ -50,7 +50,7 @@ class BasicAgentCommand extends Command
 
         try {
             $this->codingTeam->initialize(new Terminal($io));
-            $io->writeln($this->codingTeam->sendMessage($prompt));
+            $this->codingTeam->sendMessage($prompt);
         } catch (\Exception $e) {
             $io->error('Error: ' . $e->getMessage());
             return Command::FAILURE;
