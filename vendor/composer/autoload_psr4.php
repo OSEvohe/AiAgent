@@ -65,6 +65,9 @@ return array(
     'Fig\\Http\\Message\\' => array($vendorDir . '/fig/http-message-util/src'),
     'Evenement\\' => array($vendorDir . '/evenement/evenement/src'),
     'Doctrine\\Inflector\\' => array($vendorDir . '/doctrine/inflector/lib/Doctrine/Inflector'),
+    'Clue\\React\\Utf8\\' => array($vendorDir . '/clue/utf8-react/src'),
+    'Clue\\React\\Term\\' => array($vendorDir . '/clue/term-react/src'),
+    'Clue\\React\\Stdio\\' => array($vendorDir . '/clue/stdio-react/src'),
     'App\\Tests\\' => array($baseDir . '/tests'),
     'App\\' => array($baseDir . '/src'),
 );

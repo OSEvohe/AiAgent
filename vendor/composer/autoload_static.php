@@ -111,6 +111,12 @@ class ComposerStaticInitaf3a971b86a4585c7c3bf9fe517e48ae
         array (
             'Doctrine\\Inflector\\' => 19,
         ),
+        'C' => 
+        array (
+            'Clue\\React\\Utf8\\' => 16,
+            'Clue\\React\\Term\\' => 16,
+            'Clue\\React\\Stdio\\' => 17,
+        ),
         'A' => 
         array (
             'App\\Tests\\' => 10,
@@ -355,6 +361,18 @@ class ComposerStaticInitaf3a971b86a4585c7c3bf9fe517e48ae
         'Doctrine\\Inflector\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Inflector',
+        ),
+        'Clue\\React\\Utf8\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/clue/utf8-react/src',
+        ),
+        'Clue\\React\\Term\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/clue/term-react/src',
+        ),
+        'Clue\\React\\Stdio\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/clue/stdio-react/src',
         ),
         'App\\Tests\\' => 
         array (

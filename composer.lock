@@ -4,8 +4,220 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2be925dfc6358a674808c4fe545a96f9",
+    "content-hash": "82073c29c8bbe52058a9a9d2bc0cfeb1",
     "packages": [
+        {
+            "name": "clue/stdio-react",
+            "version": "v2.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/reactphp-stdio.git",
+                "reference": "dfa6c378aabdff718202d4e2453f752c38ea3399"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/reactphp-stdio/zipball/dfa6c378aabdff718202d4e2453f752c38ea3399",
+                "reference": "dfa6c378aabdff718202d4e2453f752c38ea3399",
+                "shasum": ""
+            },
+            "require": {
+                "clue/term-react": "^1.0 || ^0.1.1",
+                "clue/utf8-react": "^1.0 || ^0.1",
+                "php": ">=5.3",
+                "react/event-loop": "^1.2",
+                "react/stream": "^1.2"
+            },
+            "require-dev": {
+                "clue/arguments": "^2.0",
+                "clue/commander": "^1.2",
+                "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.35"
+            },
+            "suggest": {
+                "ext-mbstring": "Using ext-mbstring should provide slightly better performance for handling I/O"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Clue\\React\\Stdio\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@clue.engineering"
+                }
+            ],
+            "description": "Async, event-driven console input & output (STDIN, STDOUT) for truly interactive CLI applications, built on top of ReactPHP",
+            "homepage": "https://github.com/clue/reactphp-stdio",
+            "keywords": [
+                "async",
+                "autocomplete",
+                "autocompletion",
+                "cli",
+                "history",
+                "interactive",
+                "reactphp",
+                "readline",
+                "stdin",
+                "stdio",
+                "stdout"
+            ],
+            "support": {
+                "issues": "https://github.com/clue/reactphp-stdio/issues",
+                "source": "https://github.com/clue/reactphp-stdio/tree/v2.6.0"
+            },
+            "funding": [
+                {
+                    "url": "https://clue.engineering/support",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/clue",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-03-18T15:09:30+00:00"
+        },
+        {
+            "name": "clue/term-react",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/reactphp-term.git",
+                "reference": "00f297dc597eaee2ebf98af8f27cca5d21d60fa3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/reactphp-term/zipball/00f297dc597eaee2ebf98af8f27cca5d21d60fa3",
+                "reference": "00f297dc597eaee2ebf98af8f27cca5d21d60fa3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "react/stream": "^1.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.6 || ^5.7 || ^4.8.36",
+                "react/event-loop": "^1.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Clue\\React\\Term\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@clue.engineering"
+                }
+            ],
+            "description": "Streaming terminal emulator, built on top of ReactPHP.",
+            "homepage": "https://github.com/clue/reactphp-term",
+            "keywords": [
+                "C0",
+                "CSI",
+                "ansi",
+                "apc",
+                "ascii",
+                "c1",
+                "control codes",
+                "dps",
+                "osc",
+                "pm",
+                "reactphp",
+                "streaming",
+                "terminal",
+                "vt100",
+                "xterm"
+            ],
+            "support": {
+                "issues": "https://github.com/clue/reactphp-term/issues",
+                "source": "https://github.com/clue/reactphp-term/tree/v1.4.0"
+            },
+            "funding": [
+                {
+                    "url": "https://clue.engineering/support",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/clue",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-01-30T10:22:09+00:00"
+        },
+        {
+            "name": "clue/utf8-react",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/reactphp-utf8.git",
+                "reference": "d5cd04d39cb5457aa5df830b7c4b301d2694217e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/reactphp-utf8/zipball/d5cd04d39cb5457aa5df830b7c4b301d2694217e",
+                "reference": "d5cd04d39cb5457aa5df830b7c4b301d2694217e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4 || ^0.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.6 || ^5.7 || ^4.8.36",
+                "react/stream": "^1.0 || ^0.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Clue\\React\\Utf8\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@clue.engineering"
+                }
+            ],
+            "description": "Streaming UTF-8 parser, built on top of ReactPHP.",
+            "homepage": "https://github.com/clue/reactphp-utf8",
+            "keywords": [
+                "reactphp",
+                "streaming",
+                "unicode",
+                "utf-8",
+                "utf8"
+            ],
+            "support": {
+                "issues": "https://github.com/clue/reactphp-utf8/issues",
+                "source": "https://github.com/clue/reactphp-utf8/tree/v1.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://clue.engineering/support",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/clue",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-12-06T14:52:17+00:00"
+        },
         {
             "name": "evenement/evenement",
             "version": "v3.0.2",
