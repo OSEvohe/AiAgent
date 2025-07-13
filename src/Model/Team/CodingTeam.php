@@ -14,130 +14,118 @@ class CodingTeam implements Team
 {
     use MessageContextTrait;
 
+    private string $systemPromptsDir;
+
+    public function __construct()
+    {
+        $this->systemPromptsDir = $_ENV['AGENT_PROMPTS_DIR'] ?? '';
+    }
+
+    private function loadSystemPrompt(string $filePath): string
+    {
+        if (!file_exists($filePath)) {
+            throw new \Exception('System prompt file not found: ' . $filePath);
+        }
+        return file_get_contents($filePath);
+    }
 
     public function initialize(IOInterface $io): void
     {
         $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
 
-        $masterSystemMessage = <<< MASTER
-        You are the Orchestrator of a CodingTeam, responsible for coordinating code development projects.
-        Your role is to:
-        - Analyze incoming coding requests and break them down into manageable tasks
-        - Create a logical sequence of development steps
-        - Coordinate between the CodingAgent and Validator
-        - Maintain project overview and ensure all requirements are met
-        - Make decisions about task prioritization and workflow adjustments
+        try {
+            $validatorSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'validator_agent.txt');
+        } catch (\Exception $e) {
+            $io->error('Failed to load Validator system message: ' . $e->getMessage());
+            return;
+        }
 
-        Available tools:
-        - sequential-thinking: Use this to plan and structure your approach step by step
-        - CodingAgent: Implements code based on your specifications
-        - Validator: Validates code quality, functionality, and compliance
+        try {
+            $codingAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'coding_agent.txt');
+        } catch (\Exception $e) {
+            $io->error('Failed to load CodingAgent system message: ' . $e->getMessage());
+            return;
+        }
 
-        Workflow process:
-        1. Receive and analyze the coding request
-        2. Use sequential-thinking to break down the task into logical steps
-        3. Assign tasks to CodingAgent with clear specifications
-        4. Review CodingAgent's work and send to Validator for verification
-        5. Iterate based on Validator feedback until completion
-        6. Provide final project summary
+        try {
+            $searchAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'search_agent.txt');
+        } catch (\Exception $e) {
+            $io->error('Failed to load SearchAgent system message: ' . $e->getMessage());
+            return;
+        }
 
-        Communication guidelines:
-        - Be clear and specific in your task assignments
-        - Provide context and requirements for each coding task
-        - Coordinate feedback loops between agents
-        - Keep track of project progress and requirements fulfillment
-        - If you unsure you can ask your agent tools what they can do with their tools.
-        MASTER;
+        try {
+            $masterSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'orchestrator_agent.txt');
+        } catch (\Exception $e) {
+            $io->error('Failed to load Orchestrator system message: ' . $e->getMessage());
+            return;
+        }
 
-        $codingAgentSystemMessage = <<< CODING
-        You are a coding agent that interacts with PhpStorm IDE through tools.
+        try {
+            $validator = new AgentRunner(
+                openAIService: $aiService,
+                agentName: 'Validator',
+                model: '',
+                systemMessage: $validatorSystemMessage,
+                tools: [],
+                mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'validator_agent.json'),
+                io: $io
+            );
+        } catch (\Exception $e) {
+            $io->error('Failed to initialize Validator: ' . $e->getMessage());
+            return;
+        }
 
-        CRITICAL RULES:
-        - NEVER announce future actions - only report completed actions
-        - If you identify a problem or next step, immediately use the appropriate tool to address it
-        - NEVER say "I will...", "I'm going to...", "Let me..." - just do it
-        - Each response must either use a tool OR provide a final summary
-        - Use tools in sequences multiple time if required.
-        - Prioritize replace_specific_text tool for small text change
-        - Check for errors once at end of each modification, you need to open file in IDE before
+        try {
+            $codingAgent = new AgentRunner(
+                openAIService: $aiService,
+                agentName: 'CodingAgent',
+                model: '',
+                systemMessage: $codingAgentSystemMessage,
+                tools: [
+                    new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
+                ],
+                mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'coding_agent.json'),
+                io: $io
+            );
+        } catch (\Exception $e) {
+            $io->error('Failed to initialize CodingAgent: ' . $e->getMessage());
+            return;
+        }
 
-        BEHAVIOR:
-        - ALWAYS check for documentation with context7 when working non basic code
-        - Execute tasks directly using tools without explanation
-        - For complex tasks, use sequential_thinking tool first, then execute ALL planned steps
-        - Continue working until the task is complete - don't stop mid-process
-        - Only output brief summaries after ALL work is done
+        try {
+            $search_agent = new AgentRunner(
+                openAIService: $aiService,
+                agentName: 'SearchAgent',
+                model: '',
+                systemMessage: $searchAgentSystemMessage,
+                tools: [
+                    new AgentTool($io, $codingAgent, 'coding_agent_tool', 'This agent as tool can read, write, modify or create any code files, this is your primary tool for coding tasks')],
+                mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'search_agent.json'),
+                io: $io
+            );
+        } catch (\Exception $e) {
+            $io->error('Failed to initialize SearchAgent: ' . $e->getMessage());
+            return;
+        }
 
-        CORRECT APPROACH:
-        ✅ [Use tool immediately] → "Checked configuration file - found missing setting."
-        ✅ [Use another tool] → "Fixed setting and ran test successfully."
-
-        If you identify what needs to be done, do it immediately with tools. No announcements.
-        CODING;
-
-        $validatorSystemMessage = <<< VALIDATOR
-        You are the Validator responsible for quality assurance in the CodingTeam.
-
-        Your role is to:
-        - Review code implementations from the CodingAgent
-        - Verify code quality, functionality, and adherence to requirements
-        - Identify bugs, security issues, or improvement opportunities
-        - Provide constructive feedback for code refinement
-        - Ensure final deliverables meet specified standards
-
-        Available tools:
-        - Context7: Use this for comprehensive code analysis and verification
-
-        Evaluation criteria:
-        - Code functionality and correctness
-        - Code quality and readability
-        - Security considerations
-        - Performance implications
-        - Adherence to requirements and best practices
-        - Documentation completeness
-
-        Communication guidelines:
-        - Provide specific, actionable feedback
-        - Highlight both strengths and areas for improvement
-        - Suggest concrete solutions for identified issues
-        - Clearly state whether code passes validation or needs revision
-        - Prioritize feedback based on severity and impact
-        VALIDATOR;
-
-
-        $validator = new AgentRunner(
-            openAIService: $aiService,
-            agentName: 'Validator',
-            model: '',
-            systemMessage: $validatorSystemMessage,
-            tools: [],
-            mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/validator_agent.json'),
-            io: $io,
-        );
-
-        $codingAgent = new AgentRunner(
-            openAIService: $aiService,
-            agentName: 'CodingAgent',
-            model: '',
-            systemMessage: $codingAgentSystemMessage,
-            tools: [
-                new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
-            ],
-            mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/coding_agent.json'),
-            io: null,
-        );
-
-        $this->agent = new AgentRunner(
-            openAIService: $aiService,
-            agentName: 'Orchestrator',
-            model: '',
-            systemMessage: $masterSystemMessage,
-            tools: [
-                new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
-                new AgentTool($io, $codingAgent, 'coding_agent_tool', 'this agent as too can read, write, modify or create any code files, this is your primary tool for coding tasks'),
-            ],
-            mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . '/orchestrate_agent.json'),
-            io: $io,
-        );
+        try {
+            $this->agent = new AgentRunner(
+                openAIService: $aiService,
+                agentName: 'Orchestrator',
+                model: '',
+                systemMessage: $masterSystemMessage,
+                tools: [
+                    new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
+                    new AgentTool($io, $codingAgent, 'coding_agent_tool', 'this agent as too can read, write, modify or create any code files, this is your primary tool for coding tasks'),
+                    new AgentTool($io, $search_agent, 'search_agent_tool', 'This agent as tool can search online documentation and resources to find information related to coding tasks. Use this tool to gather information, examples, and best practices for coding tasks.')
+                ],
+                mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'orchestrate_agent.json'),
+                io: $io
+            );
+        } catch (\Exception $e) {
+            $io->error('Failed to initialize Orchestrator: ' . $e->getMessage());
+            return;
+        }
     }
 }

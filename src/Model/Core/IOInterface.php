@@ -5,4 +5,5 @@ namespace App\Model\Core;
 interface IOInterface
 {
     public function output(string $message): void;
+    public function error(string $message): void;
 }

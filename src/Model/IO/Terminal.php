@@ -20,4 +20,9 @@ readonly class Terminal implements IOInterface
     {
         return $this->io->ask($prompt);
     }
+
+    public function error(string $message): void
+    {
+        $this->io->error($message);
+    }
 }
