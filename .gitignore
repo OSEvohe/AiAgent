@@ -1,49 +1,13 @@
-# Ignore PHPStorm files
-.idea/
-*.iml
+/.idea/
 
-# Ignore logs
-logs/
-*.log
-
-# Ignore dependencies
-vendor/
-
-# Ignore environment files
-.env
-
-# Ignore node_modules
-node_modules/
-
-# Ignore build artifacts
-build/
-dist/
-
-# Ignore IDE and editor files
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
-
-# Ignore OS files
-*.class
-*.jar
-*.war
-*.ear
-*.zip
-*.rar
-*.7z
-
-# Ignore backup files
-*.bak
-*.backup
-*.old
-
-# Ignore screenshots
-*.png
-*.jpg
-*.jpeg
-*.gif
-
-# Ignore temporary files
-*~
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+/config/agents/extensions/
+/src/Model/Extensions/
