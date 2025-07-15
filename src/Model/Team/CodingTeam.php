@@ -9,6 +9,7 @@ use App\Model\Core\IOInterface;
 use App\Model\Core\Mcp\McpClient;
 use App\Model\Core\Provider\OpenAIService;
 use App\Model\Core\Tool\AgentTool;
+use App\Model\Tool\InformUserTool;
 
 class CodingTeam implements Team
 {
@@ -67,7 +68,7 @@ class CodingTeam implements Team
                 agentName: 'Validator',
                 model: '',
                 systemMessage: $validatorSystemMessage,
-                tools: [],
+                tools: [new InformUserTool($io)],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'validator_agent.json'),
                 io: $io
             );
@@ -83,6 +84,7 @@ class CodingTeam implements Team
                 model: '',
                 systemMessage: $codingAgentSystemMessage,
                 tools: [
+                    new InformUserTool($io),
                     new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
                 ],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'coding_agent.json'),
@@ -100,6 +102,7 @@ class CodingTeam implements Team
                 model: '',
                 systemMessage: $searchAgentSystemMessage,
                 tools: [
+                    new InformUserTool($io),
                     new AgentTool($io, $codingAgent, 'coding_agent_tool', 'This agent as tool can read, write, modify or create any code files, this is your primary tool for coding tasks')],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'search_agent.json'),
                 io: $io
@@ -116,6 +119,7 @@ class CodingTeam implements Team
                 model: '',
                 systemMessage: $masterSystemMessage,
                 tools: [
+                    new InformUserTool($io),
                     new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
                     new AgentTool($io, $codingAgent, 'coding_agent_tool', 'this agent as too can read, write, modify or create any code files, this is your primary tool for coding tasks'),
                     new AgentTool($io, $search_agent, 'search_agent_tool', 'This agent as tool can search online documentation and resources to find information related to coding tasks. Use this tool to gather information, examples, and best practices for coding tasks.')

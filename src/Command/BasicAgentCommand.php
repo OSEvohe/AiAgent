@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Interactive;
 use App\Model\IO\Terminal;
 use App\Model\Team\CodingTeam;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -40,7 +41,9 @@ class BasicAgentCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $interactive = new Interactive();
+
+        return Command::SUCCESS;
         $prompt = $input->getArgument('input');
 
         if (!$prompt) {
@@ -49,7 +52,7 @@ class BasicAgentCommand extends Command
         }
 
         try {
-            $this->codingTeam->initialize(new Terminal($io));
+            $this->codingTeam->initialize(new Terminal($this->s));
             $this->codingTeam->sendMessage($prompt);
         } catch (\Exception $e) {
             $io->error('Error: ' . $e->getMessage());
