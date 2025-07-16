@@ -7,7 +7,10 @@ use App\Model\Core\Agent\MessageContextTrait;
 use App\Model\Core\Agent\Team;
 use App\Model\Core\IOInterface;
 use App\Model\Core\Mcp\McpClient;
+use App\Model\Core\Message\Context;
+use App\Model\Core\Message\SystemMessage;
 use App\Model\Core\Provider\OpenAIService;
+use App\Model\Core\Team\TeamContextManager;
 use App\Model\Core\Tool\AgentTool;
 use App\Model\Tool\InformUserTool;
 
@@ -17,9 +20,18 @@ class CodingTeam implements Team
 
     private string $systemPromptsDir;
 
-    public function __construct()
+    public function __construct(private ?TeamContextManager $teamContextManager = null)
     {
         $this->systemPromptsDir = $_ENV['AGENT_PROMPTS_DIR'] ?? '';
+
+        if ($this->teamContextManager === null) {
+            $this->teamContextManager = new TeamContextManager([
+                new Context('orchestrator_agent', []),
+                new Context('coding_agent', []),
+                new Context('search_agent', []),
+                new Context('validator_agent', []),
+            ]);
+        }
     }
 
     public function initialize(IOInterface $io): void
@@ -28,38 +40,28 @@ class CodingTeam implements Team
 
         try {
             $validatorSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'validator_agent.txt');
-        } catch (\Exception $e) {
-            $io->error('Failed to load Validator system message: ' . $e->getMessage());
-            return;
-        }
+            $this->teamContextManager->getContext('validator_agent')->addEntry((new SystemMessage($validatorSystemMessage))->toArray());
 
-        try {
             $codingAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'coding_agent.txt');
-        } catch (\Exception $e) {
-            $io->error('Failed to load CodingAgent system message: ' . $e->getMessage());
-            return;
-        }
+            $this->teamContextManager->getContext('coding_agent')->addEntry((new SystemMessage($codingAgentSystemMessage))->toArray());
 
-        try {
             $searchAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'search_agent.txt');
+            $this->teamContextManager->getContext('search_agent')->addEntry((new SystemMessage($searchAgentSystemMessage))->toArray());
+
+            $masterSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'orchestrator_agent.txt');
+            $this->teamContextManager->getContext('orchestrator_agent')->addEntry((new SystemMessage($masterSystemMessage))->toArray());
         } catch (\Exception $e) {
-            $io->error('Failed to load SearchAgent system message: ' . $e->getMessage());
+            $io->error('Failed to load system message: ' . $e->getMessage());
             return;
         }
 
-        try {
-            $masterSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'orchestrator_agent.txt');
-        } catch (\Exception $e) {
-            $io->error('Failed to load Orchestrator system message: ' . $e->getMessage());
-            return;
-        }
 
         try {
             $validator = new AgentRunner(
                 openAIService: $aiService,
+                context: $this->teamContextManager->getContext('validator_agent'),
                 agentName: 'Validator',
                 model: '',
-                systemMessage: $validatorSystemMessage,
                 tools: [new InformUserTool($io)],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'validator_agent.json'),
                 io: null
@@ -72,9 +74,9 @@ class CodingTeam implements Team
         try {
             $codingAgent = new AgentRunner(
                 openAIService: $aiService,
+                context: $this->teamContextManager->getContext('coding_agent'),
                 agentName: 'CodingAgent',
                 model: '',
-                systemMessage: $codingAgentSystemMessage,
                 tools: [
                     new InformUserTool($io),
                     new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
@@ -90,9 +92,9 @@ class CodingTeam implements Team
         try {
             $search_agent = new AgentRunner(
                 openAIService: $aiService,
+                context: $this->teamContextManager->getContext('search_agent'),
                 agentName: 'SearchAgent',
                 model: '',
-                systemMessage: $searchAgentSystemMessage,
                 tools: [
                     new InformUserTool($io),
                 ],
@@ -107,9 +109,9 @@ class CodingTeam implements Team
         try {
             $this->agent = new AgentRunner(
                 openAIService: $aiService,
+                context: $this->teamContextManager->getContext('orchestrator_agent'),
                 agentName: 'Orchestrator',
                 model: '',
-                systemMessage: $masterSystemMessage,
                 tools: [
                     new InformUserTool($io),
                     new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
@@ -122,7 +124,7 @@ class CodingTeam implements Team
                     )
                 ],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'orchestrate_agent.json'),
-                io: $io
+                io: $io,
             );
         } catch (\Exception $e) {
             $io->error('Failed to initialize Orchestrator: ' . $e->getMessage());
