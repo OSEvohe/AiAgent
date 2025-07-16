@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Model\Core\Message\ContextManager;
+use App\Model\Core\Message\ContextManagerWithIOTerminal;
 use App\Model\IO\Terminal;
 use App\Model\Team\CodingTeam;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -28,7 +30,9 @@ class BasicChatCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $this->codingTeam->initialize(new Terminal($io));
+        $this->codingTeam->initialize(
+            contextManager: new ContextManagerWithIOTerminal(new ContextManager(), new Terminal($io))
+        );
 
         while (true) {
             $prompt = $io->ask('You:');

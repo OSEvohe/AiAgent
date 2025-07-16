@@ -6,14 +6,14 @@ class Context
 {
     private array $context = [];
 
-    public function __construct(private readonly string $agentId, array $context = [])
+    public function __construct(private readonly string $contextId, array $context = [], private bool $isParent = false)
     {
         $this->context = $context;
     }
 
-    public function getAgentId(): string
+    public function getContextId(): string
     {
-        return $this->agentId;
+        return $this->contextId;
     }
 
     public function getContext(): array
@@ -34,5 +34,16 @@ class Context
     public function toArray(): array
     {
         return array_values($this->context);
+    }
+
+    // In multi agent systems, the parent context is the one interacting with the user, while child contexts are used for sub-agents or tasks.
+    public function isParent(): bool
+    {
+        return $this->isParent;
+    }
+
+    public function isChild(): bool
+    {
+        return !$this->isParent;
     }
 }

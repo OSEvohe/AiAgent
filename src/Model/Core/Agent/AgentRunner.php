@@ -2,10 +2,10 @@
 
 namespace App\Model\Core\Agent;
 
-use App\Model\Core\IOInterface;
 use App\Model\Core\Message\Context;
 use App\Model\Core\Message\UserMessage;
 use App\Model\Core\Provider\OpenAIServiceInterface;
+use App\Model\Core\Team\ContextManagerInterface;
 use App\Model\Core\Tool\ToolsHandler;
 use Exception;
 use OpenAI\Responses\Chat\CreateResponse;
@@ -15,35 +15,27 @@ class AgentRunner
 {
     private ToolsHandler $toolsHandler;
 
-    private string $agentId;
-
     public function __construct(
         private OpenAIServiceInterface $openAIService,
-        private Context $context,
-        private string $agentName = '',
+        private readonly ContextManagerInterface $contextManager,
+        private readonly string $agentName,
+        private string $agentId,
         private string $model = '', // Will use the default model if not specified
         private array $tools = [],
         private array $mcps = [],
-        private ?IOInterface $io = null,
         private float $temperature = 0.15,
         private readonly string $tool_choice = 'auto',
         private readonly bool $parallel_tool_calls = true,
         private array $metadata = [],
-        private readonly ?AgentRunner $prePromptProcessor = null,
+        private readonly ?AgentRunner $prePromptProcessor = null
     ) {
-        $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps, $this->io);
-        $this->agentId = uniqid();
-
-        if (empty($this->agentName)){
-            $this->agentName = 'Agent_' . $this->agentId;
-        }
+        $this->toolsHandler = new ToolsHandler($this->tools, $this->mcps);
     }
 
     public function getContext(): Context
     {
-        return $this->context;
+        return $this->contextManager->getContext($this->agentId);
     }
-
 
     public function getTools(): array
     {
@@ -62,7 +54,7 @@ class AgentRunner
                 $userInput = $this->prePromptProcessor->sendUserMessage("prepare this message: " . $userInput);
             }
 
-            $this->context->addEntry($this->createUserMessage($userInput)->toArray());
+            $this->contextManager->addEntry($this->agentId, $this->createUserMessage($userInput)->toArray());
 
             return $this->processResponse();
         } catch (Exception $e) {
@@ -75,8 +67,10 @@ class AgentRunner
         return [
             'model' => $this->model,
             'tools' => array_map(fn($tool) => $tool->toArray(), $this->toolsHandler->getTools()),
-            'messages' => $this->context->toArray(),
+            'messages' => $this->contextManager->getContext($this->agentId)->toArray(),
             'temperature' => $this->temperature,
+            'top_p' => 0.95,
+            'min_p' => 0.01,
             'tool_choice' => $this->tool_choice,
             'parallel_tool_calls' => $this->parallel_tool_calls,
         ];
@@ -91,17 +85,15 @@ class AgentRunner
         $responseContent = '';
 
         foreach ($response->choices as $choice) {
-            $this->context->addEntry($choice->message->toArray());
+            $this->contextManager->addEntry($this->agentId, $choice->message->toArray());
 
             if ($choice->message->content) {
                 $responseContent = $choice->message->content;
-                $this->io?->output($this->agentName.': '.$responseContent);
-
             }
 
             if ($choice->message->toolCalls) {
                 $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
-                $this->context->addEntry($toolResult->toArray());
+                $this->contextManager->addEntry($this->agentId, $toolResult->toArray());
                 $responseContent = $this->processResponse($step + 1);
             }
         }

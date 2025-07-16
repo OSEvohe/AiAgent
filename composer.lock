@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "36639e52ed2a3ce3c5874a6a2829826b",
+    "content-hash": "55fe5791559643b86dbc95a49c344b8f",
     "packages": [
         {
             "name": "clue/stdio-react",

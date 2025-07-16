@@ -19,9 +19,9 @@ class AgentTool extends AITool
      * @param array $mcps
      * @param string $systemMessage
      */
-    public function __construct(IOInterface $output, private readonly AgentRunner $agent, string $agentName = 'TaskAgent', string $description = 'you can use this agent to perform a task', array $tools = [], array $mcps = [], string $systemMessage = '')
+    public function __construct(private readonly AgentRunner $agent, string $agentName = 'TaskAgent', string $description = 'you can use this agent to perform a task', array $tools = [], array $mcps = [], string $systemMessage = '')
     {
-        $name = $agentName . 'Tool';
+        $name = $agentName;
         $parameters = [
             'type' => 'object',
             'properties' => [

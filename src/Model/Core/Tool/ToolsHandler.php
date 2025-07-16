@@ -19,7 +19,6 @@ class ToolsHandler
         private array $tools = [],
         /** @var McpClient[] */
         private readonly array $mcps = [],
-        private readonly ?IOInterface $io = null,
     ) {
         // add each tools provided by MCPs to the tools array
         foreach ($this->mcps as $mcp) {
@@ -40,10 +39,8 @@ class ToolsHandler
         foreach ($toolCalls as $toolCall) {
             foreach ($this->tools as $tool) {
                 if ($tool->getName() === $toolCall->function->name) {
-                    $this->io?->output("Running tool: " . $tool->getName());
+                    $resultCalls[] = $tool->execute($toolCall);
                 }
-
-                $resultCalls[] = $tool->execute($toolCall);
             }
         }
         return $resultCalls;
@@ -57,11 +54,6 @@ class ToolsHandler
     ): ToolResultResponse {
         foreach ($this->tools as $tool) {
             if ($tool->getName() === $toolCall->function->name) {
-                if ($tool instanceof AgentTool) {
-                    $this->io?->output("Running AgentRunner: {$tool->getName()} with task:  {$toolCall->function->arguments}");
-                } else {
-                    $this->io?->output("Running tool: {$tool->getName()}");
-                }
                 return $tool->execute($toolCall);
             }
         }

@@ -13,9 +13,7 @@ use OpenAI\Responses\Chat\CreateResponseToolCall;
  */
 class InformUserTool extends AITool
 {
-    private IOInterface $io;
-
-    public function __construct(IOInterface $io)
+    public function __construct()
     {
         $name = 'inform_user';
         $description = 'Inform the user with a custom message';
@@ -31,7 +29,6 @@ class InformUserTool extends AITool
         ];
 
         parent::__construct($name, $description, $parameters);
-        $this->io = $io;
     }
 
     public function execute(CreateResponseToolCall $toolCall): ToolResultResponse
@@ -39,7 +36,6 @@ class InformUserTool extends AITool
         $arguments = json_decode($toolCall->function->toArray()['arguments'], true);
 
         $message = $arguments['message'];
-        $this->io->output($message);
 
         $result = [
             'text' => $message,

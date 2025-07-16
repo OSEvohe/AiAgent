@@ -28,7 +28,7 @@ class AgentAiCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $this->codingTeam->initialize(new Terminal($io));
+        $this->codingTeam->initialize();
 
         while (true) {
             $prompt = $io->ask('You:');

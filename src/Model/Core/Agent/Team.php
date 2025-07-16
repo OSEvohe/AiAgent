@@ -2,11 +2,11 @@
 
 namespace App\Model\Core\Agent;
 
-use App\Model\Core\IOInterface;
+use App\Model\Core\Team\ContextManagerInterface;
 
 interface Team
 {
-    public function initialize(IOInterface $io): void;
+    public function initialize(ContextManagerInterface $contextManager): void;
 
     public function sendMessage(string $message);
 }
