@@ -40,7 +40,7 @@ class ToolsHandler
         foreach ($toolCalls as $toolCall) {
             foreach ($this->tools as $tool) {
                 if ($tool->getName() === $toolCall->function->name) {
-                    $this->io?->output("Running tool: {$tool->getName()}");
+                    $this->io?->output("Running tool: " . $tool->getName());
                 }
 
                 $resultCalls[] = $tool->execute($toolCall);

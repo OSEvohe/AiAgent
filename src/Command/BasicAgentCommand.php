@@ -52,7 +52,7 @@ class BasicAgentCommand extends Command
         }
 
         try {
-            $this->codingTeam->initialize(new Terminal($this->s));
+            $this->codingTeam->initialize(new Terminal($io));
             $this->codingTeam->sendMessage($prompt);
         } catch (\Exception $e) {
             $io->error('Error: ' . $e->getMessage());

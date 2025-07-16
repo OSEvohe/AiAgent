@@ -22,14 +22,6 @@ class CodingTeam implements Team
         $this->systemPromptsDir = $_ENV['AGENT_PROMPTS_DIR'] ?? '';
     }
 
-    private function loadSystemPrompt(string $filePath): string
-    {
-        if (!file_exists($filePath)) {
-            throw new \Exception('System prompt file not found: ' . $filePath);
-        }
-        return file_get_contents($filePath);
-    }
-
     public function initialize(IOInterface $io): void
     {
         $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
@@ -70,7 +62,7 @@ class CodingTeam implements Team
                 systemMessage: $validatorSystemMessage,
                 tools: [new InformUserTool($io)],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'validator_agent.json'),
-                io: $io
+                io: null
             );
         } catch (\Exception $e) {
             $io->error('Failed to initialize Validator: ' . $e->getMessage());
@@ -88,7 +80,7 @@ class CodingTeam implements Team
                     new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
                 ],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'coding_agent.json'),
-                io: $io
+                io: null
             );
         } catch (\Exception $e) {
             $io->error('Failed to initialize CodingAgent: ' . $e->getMessage());
@@ -103,9 +95,9 @@ class CodingTeam implements Team
                 systemMessage: $searchAgentSystemMessage,
                 tools: [
                     new InformUserTool($io),
-                    new AgentTool($io, $codingAgent, 'coding_agent_tool', 'This agent as tool can read, write, modify or create any code files, this is your primary tool for coding tasks')],
+                ],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'search_agent.json'),
-                io: $io
+                io: null
             );
         } catch (\Exception $e) {
             $io->error('Failed to initialize SearchAgent: ' . $e->getMessage());
@@ -122,7 +114,12 @@ class CodingTeam implements Team
                     new InformUserTool($io),
                     new AgentTool($io, $validator, 'validator_agent_tool', 'This agent as tool can review code quality by using online documentation,  it can also check git statuts, check for errors in a file'),
                     new AgentTool($io, $codingAgent, 'coding_agent_tool', 'this agent as too can read, write, modify or create any code files, this is your primary tool for coding tasks'),
-                    new AgentTool($io, $search_agent, 'search_agent_tool', 'This agent as tool can search online documentation and resources to find information related to coding tasks. Use this tool to gather information, examples, and best practices for coding tasks.')
+                    new AgentTool(
+                        $io,
+                        $search_agent,
+                        'search_agent_tool',
+                        'This agent as tool can search online documentation and resources to find information related to coding tasks. Use this tool to gather information, examples, and best practices for coding tasks.'
+                    )
                 ],
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'orchestrate_agent.json'),
                 io: $io
@@ -131,5 +128,13 @@ class CodingTeam implements Team
             $io->error('Failed to initialize Orchestrator: ' . $e->getMessage());
             return;
         }
+    }
+
+    private function loadSystemPrompt(string $filePath): string
+    {
+        if (!file_exists($filePath)) {
+            throw new \Exception('System prompt file not found: ' . $filePath);
+        }
+        return file_get_contents($filePath);
     }
 }
