@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Factory\ContextManagerPersistedFactory;
 use App\Model\Core\Message\ContextManager;
 use App\Model\Core\Message\ContextManagerWithIOTerminal;
 use App\Model\IO\Terminal;
@@ -18,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class BasicChatCommand extends Command
 {
-    public function __construct(private readonly CodingTeam $codingTeam)
+    public function __construct(private readonly CodingTeam $codingTeam, private readonly ContextManagerPersistedFactory $factory)
     {
         parent::__construct();
     }
@@ -30,9 +31,14 @@ class BasicChatCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $this->codingTeam->initialize(
-            contextManager: new ContextManagerWithIOTerminal(new ContextManager(), new Terminal($io))
-        );
+        // exemple using Decorator pattern to add IO and Persisting capabilities to the context manager
+        $contextManager = new ContextManager();
+        $contextManagerPersisted = $this->factory->create(contextManager: $contextManager, discussionId: '6878131721aaf'); // Example discussion ID
+        $contextManagerPersistedWithIO = new ContextManagerWithIOTerminal(contextManager: $contextManagerPersisted, terminal: new Terminal($io));
+
+        $this->codingTeam->initialize(contextManager: $contextManagerPersistedWithIO);
+
+        dump($contextManagerPersistedWithIO->getContext('orchestrator_agent'));
 
         while (true) {
             $prompt = $io->ask('You:');

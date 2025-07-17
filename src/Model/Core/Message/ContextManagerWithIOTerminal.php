@@ -5,18 +5,19 @@ namespace App\Model\Core\Message;
 use App\Model\Core\Team\ContextManagerInterface;
 use App\Model\IO\Terminal;
 
-class ContextManagerWithIOTerminal extends ContextManager implements ContextManagerInterface
+readonly class ContextManagerWithIOTerminal implements ContextManagerInterface
 {
     public function __construct(
-        ContextManagerInterface $contextManager,
-        private readonly Terminal $terminal
+        private ContextManagerInterface $contextManager,
+        private Terminal $terminal
     ) {
-        parent::__construct($contextManager->getContexts());
     }
 
     public function addEntry(string $agentId, array $entry): void
     {
-        parent::addEntry($agentId, $entry);
+        $this->contextManager->addEntry($agentId, $entry);
+
+        dump($entry, $agentId);
 
         if (($entry['role'] ?? false) && $entry['role'] === 'assistant') {
             if (isset($entry['content']) && $this->getContext($agentId)->isParent()) {
@@ -29,5 +30,35 @@ class ContextManagerWithIOTerminal extends ContextManager implements ContextMana
                 }
             }
         }
+    }
+
+    public function getContexts(): array
+    {
+        return $this->contextManager->getContexts();
+    }
+
+    public function getContext(string $agentId): ?Context
+    {
+        return $this->contextManager->getContext($agentId);
+    }
+
+    public function getEntry(string $agentId, int $key): ?array
+    {
+        return $this->contextManager->getEntry($agentId, $key);
+    }
+
+    public function addContext(Context $context): string
+    {
+        return $this->contextManager->addContext($context);
+    }
+
+    public function toArray(): array
+    {
+        return $this->contextManager->toArray();
+    }
+
+    public function loadDiscussion(): ContextManagerInterface
+    {
+        return $this->contextManager->loadDiscussion();
     }
 }

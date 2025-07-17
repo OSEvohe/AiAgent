@@ -16,23 +16,6 @@ class ContextManager implements ContextManagerInterface
     private array $contexts = [];
 
     /**
-     * Constructor
-     *
-     * Initializes the manager with an array of contexts.
-     * Each context must be an instance of Context class.
-     *
-     * @param Context[] $contexts
-     */
-    public function __construct(array $contexts = [])
-    {
-        foreach ($contexts as $context) {
-            if ($context instanceof Context) {
-                $this->contexts[$context->getContextId()] = $context;
-            }
-        }
-    }
-
-    /**
      * Gets all contexts.
      *
      * @return Context[]
@@ -107,4 +90,8 @@ class ContextManager implements ContextManagerInterface
         return $result;
     }
 
+    public function loadDiscussion(): ContextManagerInterface
+    {
+        return $this; // For stateless context manager, return itself
+    }
 }

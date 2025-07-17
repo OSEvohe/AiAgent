@@ -4,11 +4,13 @@ namespace App\Model\Core\Message;
 
 class Context
 {
-    private array $context = [];
+    private ?SystemMessage $systemMessage = null;
 
-    public function __construct(private readonly string $contextId, array $context = [], private bool $isParent = false)
-    {
-        $this->context = $context;
+    public function __construct(
+        private readonly string $contextId,
+        private array $context = [],
+        private bool $isParent = false
+    ) {
     }
 
     public function getContextId(): string
@@ -33,7 +35,18 @@ class Context
 
     public function toArray(): array
     {
-        return array_values($this->context);
+        // merge system message if it exists
+        $contextArray = [];
+
+        if ($this->systemMessage) {
+            $contextArray[] = $this->systemMessage->toArray();
+        }
+
+        foreach ($this->context as $entry) {
+            $contextArray[] = $entry;
+        }
+
+        return $contextArray;
     }
 
     // In multi agent systems, the parent context is the one interacting with the user, while child contexts are used for sub-agents or tasks.
@@ -46,4 +59,25 @@ class Context
     {
         return !$this->isParent;
     }
+
+    public function getSystemMessage(): ?SystemMessage
+    {
+        return $this->systemMessage;
+    }
+
+    public function setSystemMessage(SystemMessage $systemMessage): void
+    {
+        $this->systemMessage = $systemMessage;
+    }
+
+    public function setIsParent(): void
+    {
+        $this->isParent = true;
+    }
+
+    public function setIsChild(): void
+    {
+        $this->isParent = false;
+    }
+
 }

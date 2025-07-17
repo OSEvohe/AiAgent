@@ -33,28 +33,42 @@ class CodingTeam implements Team
         $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
         $this->contextManager = $contextManager;
 
-        if (empty($this->contextManager->getContexts())) {
-            dump('No contexts found, initializing default contexts.');
-            $this->contextManager->addContext(context: new Context('validator_agent', context: []));
-            $this->contextManager->addContext(context: new Context(contextId: 'coding_agent', context: []));
-            $this->contextManager->addContext(context: new Context(contextId: 'search_agent', context: []));
+
+        // Initialize contexts for each agent
+        $this->contextManager->loadDiscussion();
+
+        // create contexts for each agent if not exists
+        if (is_null($this->contextManager->getContext('orchestrator_agent'))) {
             $this->contextManager->addContext(context: new Context(contextId: 'orchestrator_agent', context: [], isParent: true));
-            try {
-                $validatorSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'validator_agent.txt');
-                $this->contextManager->getContext('validator_agent')->addEntry((new SystemMessage($validatorSystemMessage))->toArray());
-
-                $codingAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'coding_agent.txt');
-                $this->contextManager->getContext('coding_agent')->addEntry((new SystemMessage($codingAgentSystemMessage))->toArray());
-
-                $searchAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'search_agent.txt');
-                $this->contextManager->getContext('search_agent')->addEntry((new SystemMessage($searchAgentSystemMessage))->toArray());
-
-                $masterSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'orchestrator_agent.txt');
-                $this->contextManager->getContext('orchestrator_agent')->addEntry((new SystemMessage($masterSystemMessage))->toArray());
-            } catch (\Exception $e) {
-                throw new \Exception('Failed to load system prompts: ' . $e->getMessage());
-            }
         }
+        if (is_null($this->contextManager->getContext('search_agent'))) {
+            $this->contextManager->addContext(context: new Context(contextId: 'search_agent', context: [], isParent: false));
+        }
+        if (is_null($this->contextManager->getContext('validator_agent'))) {
+            $this->contextManager->addContext(context: new Context(contextId: 'validator_agent', context: [], isParent: false));
+        }
+
+        if (is_null($this->contextManager->getContext('coding_agent'))) {
+            $this->contextManager->addContext(context: new Context(contextId: 'coding_agent', context: [], isParent: false));
+        }
+
+        // Load system prompts for each agent
+        try {
+            $validatorSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'validator_agent.txt');
+            $codingAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'coding_agent.txt');
+            $searchAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'search_agent.txt');
+            $masterSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'orchestrator_agent.txt');
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to load system prompts: ' . $e->getMessage());
+        }
+
+        // Add system messages to contexts
+        $this->contextManager->getContext('orchestrator_agent')->setSystemMessage(new SystemMessage($masterSystemMessage));
+        $this->contextManager->getContext('orchestrator_agent')->setIsParent();
+
+        $this->contextManager->getContext('search_agent')->setSystemMessage(new SystemMessage($searchAgentSystemMessage));
+        $this->contextManager->getContext('validator_agent')->setSystemMessage(new SystemMessage($validatorSystemMessage));
+        $this->contextManager->getContext('coding_agent')->setSystemMessage(new SystemMessage($codingAgentSystemMessage));
 
 
         try {

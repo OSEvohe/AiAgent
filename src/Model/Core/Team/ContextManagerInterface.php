@@ -3,6 +3,7 @@
 namespace App\Model\Core\Team;
 
 
+use App\Entity\Discussion;
 use App\Model\Core\Message\Context;
 
 /**
@@ -55,4 +56,13 @@ interface ContextManagerInterface
     public function addContext(Context $context): string;
 
     public function toArray(): array;
+
+    /**
+     * Loads the discussion.
+     * load discussion's contexts from db or any other storage
+     * stateless context manager should return empty discussion
+     *
+     * @return ContextManagerInterface
+     */
+    public function loadDiscussion(): self;
 }
