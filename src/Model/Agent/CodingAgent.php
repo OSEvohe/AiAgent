@@ -1,24 +1,24 @@
 <?php
 
-namespace App\Model\Team;
+namespace App\Model\Agent;
 
 use App\Model\Core\Agent\AgentRunner;
-use App\Model\Core\Agent\MessageContextTrait;
-use App\Model\Core\Agent\Team;
+use App\Model\Core\Agent\UseAgentRunnerTrait;
+use App\Model\Core\Agent\AgentInterface;
 use App\Model\Core\Mcp\McpClient;
 use App\Model\Core\Message\Context;
-use App\Model\Core\Message\ContextManagerInterface;
+use App\Model\Core\Message\ContextInterface;
 use App\Model\Core\Message\SystemMessage;
 use App\Model\Core\Provider\OpenAIService;
 use App\Model\Core\Tool\AgentTool;
 use App\Model\Tool\InformUserTool;
 
-class CodingTeam implements Team
+class CodingAgent extends Agent
 {
-    use MessageContextTrait;
+    use UseAgentRunnerTrait;
 
     private string $systemPromptsDir;
-    private ?ContextManagerInterface $contextManager = null;
+    private ?ContextInterface $contextManager = null;
 
     public function __construct()
     {
@@ -28,7 +28,7 @@ class CodingTeam implements Team
     /**
      * @throws \Exception
      */
-    public function initialize(ContextManagerInterface $contextManager): void
+    public function initialize(ContextInterface $contextManager): void
     {
         $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
         $this->contextManager = $contextManager;
@@ -89,7 +89,7 @@ class CodingTeam implements Team
             $codingAgent = new AgentRunner(
                 openAIService: $aiService,
                 contextManager: $this->contextManager,
-                agentName: 'CodingAgent',
+                agentName: 'CodingAgentInterface',
                 agentId: 'coding_agent',
                 model: '',
                 tools: [
@@ -99,7 +99,7 @@ class CodingTeam implements Team
                 mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'coding_agent.json'),
             );
         } catch (\Exception $e) {
-            throw new \Exception('Failed to initialize CodingAgent: ' . $e->getMessage());
+            throw new \Exception('Failed to initialize CodingAgentInterface: ' . $e->getMessage());
         }
 
         try {

@@ -7,54 +7,47 @@ use App\Entity\Discussion;
 use App\Repository\ContextRepository;
 use App\Repository\DiscussionRepository;
 
-class ContextManagerPersisted implements ContextManagerInterface
+class ContextPersisted implements ContextInterface
 {
     public function __construct(
-        private readonly ContextManagerInterface $contextManager,
-        private readonly DiscussionRepository $discussionRepository,
+        private readonly ContextInterface $contextManager,
+        //private readonly DiscussionRepository $discussionRepository,
         private readonly ContextRepository $contextRepository,
-        private ?Discussion $discussion = null
+        private ?Discussion $discussion,
+        private string $agentId
     ) {
-        if ($discussion === null) {
+        /*if ($discussion === null) {
             $this->discussion = new Discussion();
             $this->discussion->setUid(uniqid());
             $this->discussion->setTitle('Discussion ' . date('Y-m-d H:i:s'));
             $this->discussionRepository->save($this->discussion);
-        }
+        }*/
     }
 
-    public function addEntry(string $agentId, array $entry): void
+    public function addEntry(array $entry): self
     {
-        $this->contextManager->addEntry($agentId, $entry);
+        $this->contextManager->addEntry($entry);
 
         $newContextEntity = new ContextEntity();
-        $newContextEntity->setAgentId($agentId)
+        $newContextEntity->setAgentId($this->agentId)
             ->setCreatedAt(new \DateTimeImmutable())
             ->setDiscussion($this->discussion)
             ->setRole($entry['role'])
             ->setData($entry);
 
         $this->contextRepository->save($newContextEntity);
+
+        return $this;
     }
 
-    public function getContexts(): array
+    public function getContext(): array
     {
-        return $this->contextManager->getContexts();
+        return $this->contextManager->getContext();
     }
 
-    public function getContext(string $agentId): ?Context
+    public function getEntry(int $key): ?array
     {
-        return $this->contextManager->getContext($agentId);
-    }
-
-    public function getEntry(string $agentId, int $key): ?array
-    {
-        return $this->contextManager->getEntry($agentId, $key);
-    }
-
-    public function addContext(Context $context): string
-    {
-        return $this->contextManager->addContext($context);
+        return $this->contextManager->getEntry($key);
     }
 
     public function toArray(): array
@@ -81,5 +74,20 @@ class ContextManagerPersisted implements ContextManagerInterface
 
 
         return $this;
+    }
+
+    public function setContext(array $data): ContextInterface
+    {
+        return $this->contextManager->setContext($data);
+    }
+
+    public function getSystemMessage(): ?SystemMessage
+    {
+        return $this->contextManager->getSystemMessage();
+    }
+
+    public function setSystemMessage(SystemMessage $systemMessage): ContextInterface
+    {
+        return $this->contextManager->setSystemMessage($systemMessage);
     }
 }

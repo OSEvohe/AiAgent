@@ -2,20 +2,13 @@
 
 namespace App\Model\Core\Message;
 
-class Context
+class Context implements ContextInterface
 {
     private ?SystemMessage $systemMessage = null;
 
     public function __construct(
-        private readonly string $contextId,
         private array $context = [],
-        private bool $isParent = false
     ) {
-    }
-
-    public function getContextId(): string
-    {
-        return $this->contextId;
     }
 
     public function getContext(): array
@@ -23,14 +16,16 @@ class Context
         return $this->context;
     }
 
-    public function addEntry(array $entry): void
+    public function addEntry(array $entry): self
     {
         $this->context[uniqid()] = $entry;
+
+        return $this;
     }
 
-    public function get(int $index): ?array
+    public function getEntry(int $key): ?array
     {
-        return $this->context[$index] ?? null;
+        return $this->context[$key] ?? null;
     }
 
     public function toArray(): array
@@ -49,35 +44,23 @@ class Context
         return $contextArray;
     }
 
-    // In multi agent systems, the parent context is the one interacting with the user, while child contexts are used for sub-agents or tasks.
-    public function isParent(): bool
-    {
-        return $this->isParent;
-    }
-
-    public function isChild(): bool
-    {
-        return !$this->isParent;
-    }
-
     public function getSystemMessage(): ?SystemMessage
     {
         return $this->systemMessage;
     }
 
-    public function setSystemMessage(SystemMessage $systemMessage): void
+    public function setSystemMessage(SystemMessage $systemMessage): self
     {
         $this->systemMessage = $systemMessage;
+
+        return $this;
     }
 
-    public function setIsParent(): void
+
+    public function setContext(array $data): self
     {
-        $this->isParent = true;
-    }
+        $this->context = $data;
 
-    public function setIsChild(): void
-    {
-        $this->isParent = false;
+        return $this;
     }
-
 }

@@ -3,7 +3,7 @@
 namespace App\Model\Core\Agent;
 
 use App\Model\Core\Message\Context;
-use App\Model\Core\Message\ContextManagerInterface;
+use App\Model\Core\Message\ContextInterface;
 use App\Model\Core\Message\UserMessage;
 use App\Model\Core\Provider\OpenAIServiceInterface;
 use App\Model\Core\Tool\ToolsHandler;
@@ -17,7 +17,7 @@ class AgentRunner
 
     public function __construct(
         private OpenAIServiceInterface $openAIService,
-        private readonly ContextManagerInterface $contextManager,
+        private readonly ContextInterface $contextManager,
         private readonly string $agentName,
         private string $agentId,
         private string $model = '', // Will use the default model if not specified

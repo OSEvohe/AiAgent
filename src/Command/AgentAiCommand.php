@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Model\IO\Terminal;
-use App\Model\Team\CodingTeam;
+use App\Model\Agent\CodingAgentInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class AgentAiCommand extends Command
 {
-    public function __construct(private readonly CodingTeam $codingTeam)
+    public function __construct(private readonly CodingAgentInterface $codingTeam)
     {
         parent::__construct();
     }
