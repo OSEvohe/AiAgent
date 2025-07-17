@@ -2,8 +2,6 @@
 
 namespace App\Model\Core\Message;
 
-use App\Model\Core\Team\ContextManagerInterface;
-
 /**
  * Class ContextManager
  *

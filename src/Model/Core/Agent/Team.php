@@ -2,7 +2,7 @@
 
 namespace App\Model\Core\Agent;
 
-use App\Model\Core\Team\ContextManagerInterface;
+use App\Model\Core\Message\ContextManagerInterface;
 
 interface Team
 {

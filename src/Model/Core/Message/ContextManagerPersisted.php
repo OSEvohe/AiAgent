@@ -2,9 +2,8 @@
 
 namespace App\Model\Core\Message;
 
-use App\Entity\Discussion;
-use App\Model\Core\Team\ContextManagerInterface;
 use App\Entity\Context as ContextEntity;
+use App\Entity\Discussion;
 use App\Repository\ContextRepository;
 use App\Repository\DiscussionRepository;
 

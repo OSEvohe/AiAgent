@@ -2,8 +2,8 @@
 
 namespace App\Factory;
 
+use App\Model\Core\Message\ContextManagerInterface;
 use App\Model\Core\Message\ContextManagerPersisted;
-use App\Model\Core\Team\ContextManagerInterface;
 use App\Repository\ContextRepository;
 use App\Repository\DiscussionRepository;
 

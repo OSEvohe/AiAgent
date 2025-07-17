@@ -3,9 +3,9 @@
 namespace App\Model\Core\Agent;
 
 use App\Model\Core\Message\Context;
+use App\Model\Core\Message\ContextManagerInterface;
 use App\Model\Core\Message\UserMessage;
 use App\Model\Core\Provider\OpenAIServiceInterface;
-use App\Model\Core\Team\ContextManagerInterface;
 use App\Model\Core\Tool\ToolsHandler;
 use Exception;
 use OpenAI\Responses\Chat\CreateResponse;

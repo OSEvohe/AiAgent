@@ -7,9 +7,9 @@ use App\Model\Core\Agent\MessageContextTrait;
 use App\Model\Core\Agent\Team;
 use App\Model\Core\Mcp\McpClient;
 use App\Model\Core\Message\Context;
+use App\Model\Core\Message\ContextManagerInterface;
 use App\Model\Core\Message\SystemMessage;
 use App\Model\Core\Provider\OpenAIService;
-use App\Model\Core\Team\ContextManagerInterface;
 use App\Model\Core\Tool\AgentTool;
 use App\Model\Tool\InformUserTool;
 

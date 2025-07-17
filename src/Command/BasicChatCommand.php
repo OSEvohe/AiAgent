@@ -38,7 +38,7 @@ class BasicChatCommand extends Command
 
         $this->codingTeam->initialize(contextManager: $contextManagerPersistedWithIO);
 
-        dump($contextManagerPersistedWithIO->getContext('orchestrator_agent'));
+        // dump($contextManagerPersistedWithIO->getContext('orchestrator_agent'));
 
         while (true) {
             $prompt = $io->ask('You:');

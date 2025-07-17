@@ -1,10 +1,7 @@
 <?php
 
-namespace App\Model\Core\Team;
+namespace App\Model\Core\Message;
 
-
-use App\Entity\Discussion;
-use App\Model\Core\Message\Context;
 
 /**
  * Class ContextManager

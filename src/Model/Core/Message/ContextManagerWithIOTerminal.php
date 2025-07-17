@@ -2,7 +2,6 @@
 
 namespace App\Model\Core\Message;
 
-use App\Model\Core\Team\ContextManagerInterface;
 use App\Model\IO\Terminal;
 
 readonly class ContextManagerWithIOTerminal implements ContextManagerInterface
@@ -17,7 +16,7 @@ readonly class ContextManagerWithIOTerminal implements ContextManagerInterface
     {
         $this->contextManager->addEntry($agentId, $entry);
 
-        dump($entry, $agentId);
+        // dump($entry, $agentId);
 
         if (($entry['role'] ?? false) && $entry['role'] === 'assistant') {
             if (isset($entry['content']) && $this->getContext($agentId)->isParent()) {
