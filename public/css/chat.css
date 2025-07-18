@@ -1,0 +1,16 @@
+.messagerie {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.messagerie .message-area {
+  flex: 1;
+  overflow-y: auto;
+}
+.messagerie .input-area {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #2d2d2d;
+  padding: 1em;
+}

@@ -9,7 +9,7 @@
         <header class="chat-header">
             <h1>AI Chat</h1>
             <div class="header-buttons">
-                <button class="settings-btn">⚙️</button>
+                <button class="settings-btn">⚙️</button>&#x1f600;
             </div>
         </header>
         <main class="chat-main">
@@ -21,14 +21,14 @@
                 {{ component('MessageAreaComponent') }}
             </section>
         </main>
-        <footer class="chat-input">
-            <textarea id="messageInput" placeholder="Type your message here..." rows="5"></textarea>
-            <button id="sendButton" disabled>Send</button>
-            <div class="typing-indicator" id="typingIndicator">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </footer>
     </div>
+    <footer class="chat-input">
+        <textarea id="messageInput" placeholder="Type your message here..." rows="5"></textarea>
+        <button id="sendButton" disabled>Send</button>
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </footer>
 {% endblock %}
