@@ -4,8 +4,10 @@ namespace App\Command;
 
 use App\Interactive;
 use App\Model\Agent\CodingAgentFactory;
-use App\Model\IO\Terminal;
 use App\Model\Agent\CodingAgentInterface;
+use App\Model\Core\Message\Context;
+use App\Model\Core\Message\ContextWithIOTerminal;
+use App\Model\IO\Terminal;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,12 +17,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'basic-agent',
-    description: 'Add a short description for your command',
+    description: 'A basic agent command that interacts with a coding agent on a one turn interaction',
 )]
 class BasicAgentCommand extends Command
 {
-    public function __construct(private readonly CodingAgentFactory $codingTeam)
-    {
+    public function __construct(
+        private readonly CodingAgentFactory $codingAgentFactory,
+    ) {
         parent::__construct();
     }
 
@@ -39,40 +42,32 @@ class BasicAgentCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $interactive = new Interactive();
+        $io = new SymfonyStyle($input, $output);
 
-        return Command::SUCCESS;
-        $prompt = $input->getArgument('input');
+        // --- Create a new context manager for each agent. ---
+        $contexts = [
+            'coding_agent' => new ContextWithIOTerminal(
+                context: new Context(),
+                terminal: new Terminal($io)
+            ),
+            'search_agent' => new ContextWithIOTerminal(
+                context: new Context(),
+                terminal: new Terminal($io),
+                outputAssistant: false
+            )
+        ];
 
-        if (!$prompt) {
-            $io->note('No input provided. Please provide a prompt as an argument.');
-            return Command::FAILURE;
-        }
 
-        try {
-            $this->codingTeam->initialize(new Terminal($io));
-            $this->codingTeam->sendMessage($prompt);
-        } catch (\Exception $e) {
-            $io->error('Error: ' . $e->getMessage());
-            return Command::FAILURE;
-        }
+        // --- Initialize the coding agent with context managers ---
+        $codingAgentRunner = $this->codingAgentFactory->create($contexts);
+
+        $codingAgentRunner->sendUserMessage($input->getArgument('input'));
+
 
         return Command::SUCCESS;
     }
-
-    /**
-     * tools: [
-     * new AgentTool(
-     * output: new Terminal($output),
-     * agentName: 'Jetbrains_Agent',
-     * description: 'This is an AI agent that can perform coding tasks using Jetbrains tools. Use this agent to automate coding tasks. Ask for precise tasks, AgentRunner may ask you for more details if needed. Split Your tasks by calling this tool multiple times. Do not ask for the same task if an error is returned',
-     * mcps: [new Jetbrains()],
-     * systemMessage: 'You are a coding agent that can perform tasks using Jetbrains tools. You can use the tools provided by the MCPs to perform tasks. If you need more information, ask the user for details.'
-     * )
-     * ],
-     * mcps: [],
-     */
 }
