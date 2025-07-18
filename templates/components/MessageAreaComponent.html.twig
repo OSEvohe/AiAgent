@@ -8,7 +8,7 @@
             </div>
         {% elseif entry.role != 'tool' %}
             <div class="message {{ entry.role == 'user' ? 'user-message' : 'ai-message' }}">
-                <p>{{ entry.data.content|raw }}</p>
+                <p>{{ entry.data.content|raw|nl2br }}</p>
             </div>
         {% endif %}
     {% endfor %}
