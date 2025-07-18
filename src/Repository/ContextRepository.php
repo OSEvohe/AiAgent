@@ -20,5 +20,6 @@ class ContextRepository extends ServiceEntityRepository
     {
         $this->getEntityManager()->persist($context);
         $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
     }
 }

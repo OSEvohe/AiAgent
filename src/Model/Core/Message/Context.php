@@ -20,6 +20,8 @@ class Context implements ContextInterface
     {
         $this->context[uniqid()] = $entry;
 
+        dump('Context::addEntry', $entry);
+
         return $this;
     }
 

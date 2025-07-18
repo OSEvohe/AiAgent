@@ -1,14 +1,26 @@
-<div {{ attributes }}
-        data-poll="delay(1000)|$render"
->
+<div {{ attributes }} data-poll="delay(1000)|$render">
     {% for entry in this.messages %}
         {% if entry.role == 'assistant' and entry.data.tool_calls is defined and entry.data.tool_calls|length > 0 %}
-            <div class="message ai-message">
-                <p><strong>Tool:</strong> {{ entry.data.tool_calls[0].function.name }}</p>
+            <div class="message-wrapper ai-message-wrapper">
+                <div class="message tool-message">
+                    <p><strong>&#x1F6E0;</strong> {{ entry.data.tool_calls[0].function.name }}</p>
+                </div>
             </div>
-        {% elseif entry.role != 'tool' %}
-            <div class="message {{ entry.role == 'user' ? 'user-message' : 'ai-message' }}">
-                <p>{{ entry.data.content|raw|nl2br }}</p>
+        {% endif %}
+
+        {% if entry.role == 'user' %}
+            <div class="message-wrapper user-message-wrapper">
+                <div class="message user-message">
+                    <p>{{ entry.data.content|raw|nl2br }}</p>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if entry.role == 'assistant' and entry.data.content is not null %}
+            <div class="message-wrapper ai-message-wrapper">
+                <div class="message ai-message">
+                    <p>{{ entry.data.content|raw|nl2br }}</p>
+                </div>
             </div>
         {% endif %}
     {% endfor %}

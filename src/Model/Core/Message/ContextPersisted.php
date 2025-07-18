@@ -36,6 +36,8 @@ class ContextPersisted implements ContextInterface
             ->setData($entry);
 
         $this->contextRepository->save($newContextEntity);
+        dump('ContextPersisted::addEntry', $entry);
+
 
         return $this;
     }

@@ -21,14 +21,6 @@
                 {{ component('MessageAreaComponent') }}
             </section>
         </main>
+           {{ component('InputAreaComponent') }}
     </div>
-    <footer class="chat-input">
-        <textarea id="messageInput" placeholder="Type your message here..." rows="5"></textarea>
-        <button id="sendButton" disabled>Send</button>
-        <div class="typing-indicator" id="typingIndicator">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </footer>
 {% endblock %}
