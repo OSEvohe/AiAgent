@@ -1,24 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Interface</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles.css') }}">
+{% endblock %}
+
+{% block body %}
     <div class="chat-container">
-        <aside class="discussion-list">
-            <button class="new-discussion-btn">New Discussion</button>
-            <!-- Discussion items will be added here -->
-        </aside>
         <header class="chat-header">
             <h1>AI Chat</h1>
-            <button class="clear-chat-btn">Clear Chat</button>
-            <button class="settings-btn">⚙️</button>
+            <div class="header-buttons">
+                <button class="settings-btn">⚙️</button>
+            </div>
         </header>
-        <main class="chat-messages" id="chatMessages">
-            <!-- Messages will be added here -->
+        <main class="chat-main">
+            <aside class="discussion-list">
+                <button class="new-discussion-btn">New Discussion</button>
+                <!-- Discussion items will be added here -->
+            </aside>
+            <section class="message-area" id="chatMessages">
+                {{ component('MessageAreaComponent') }}
+            </section>
         </main>
         <footer class="chat-input">
             <textarea id="messageInput" placeholder="Type your message here..." rows="5"></textarea>
@@ -30,6 +31,4 @@
             </div>
         </footer>
     </div>
-    <script src="scripts.js"></script>
-</body>
-</html>
+{% endblock %}

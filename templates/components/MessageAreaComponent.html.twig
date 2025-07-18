@@ -1,0 +1,15 @@
+<div {{ attributes }}
+        data-poll="delay(1000)|$render"
+>
+    {% for entry in this.messages %}
+        {% if entry.role == 'assistant' and entry.data.tool_calls is defined and entry.data.tool_calls|length > 0 %}
+            <div class="message ai-message">
+                <p><strong>Tool:</strong> {{ entry.data.tool_calls[0].function.name }}</p>
+            </div>
+        {% elseif entry.role != 'tool' %}
+            <div class="message {{ entry.role == 'user' ? 'user-message' : 'ai-message' }}">
+                <p>{{ entry.data.content|nl2br }}</p>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
