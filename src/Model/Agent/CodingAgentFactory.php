@@ -2,42 +2,62 @@
 
 namespace App\Model\Agent;
 
+use App\Model\Core\Agent\Agent;
 use App\Model\Core\Agent\AgentRunner;
-use App\Model\Core\Agent\UseAgentRunnerTrait;
-use App\Model\Core\Agent\AgentInterface;
 use App\Model\Core\Mcp\McpClient;
-use App\Model\Core\Message\Context;
 use App\Model\Core\Message\ContextInterface;
 use App\Model\Core\Message\SystemMessage;
 use App\Model\Core\Provider\OpenAIService;
-use App\Model\Core\Tool\AgentTool;
-use App\Model\Tool\InformUserTool;
+use Exception;
 
-class CodingAgent extends Agent
+
+/**
+ * This is an example of a coding agent defined programmatically using a php class
+ * This class work like a Factory for Agent Class */
+class CodingAgentFactory
 {
-    use UseAgentRunnerTrait;
-
-    private string $systemPromptsDir;
-    private ?ContextInterface $contextManager = null;
-
     public function __construct()
     {
-        $this->systemPromptsDir = $_ENV['AGENT_PROMPTS_DIR'] ?? '';
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function initialize(ContextInterface $contextManager): void
+    public function create(ContextInterface $contextManager): AgentRunner
     {
+        // --- Initialize the Coding Agent context ---
+        $systemPromptsDir = $_ENV['AGENT_PROMPTS_DIR'] ?? '';
         $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
-        $this->contextManager = $contextManager;
+        $mcps = McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'examples/coding_agent.json');
+        $tools = [];
+
+        $contextManager->setSystemMessage(
+            systemMessage: new SystemMessage(
+                input: $this->loadSystemPrompt($systemPromptsDir . 'examples/coding_agent.txt')
+            )
+        );
 
 
-        // Initialize contexts for each agent
-        $this->contextManager->loadDiscussion();
+        // --- Create the Coding Agent ---
+        $codingAgent = new Agent(
+            openAIService: $aiService,
+            contextManager: $contextManager,
+            agentName: 'CodingAgentFactory',
+            agentId: 'coding_agent',
+            model: '',
+            tools: $tools,
+            mcps: $mcps,
+            parallelToolCalls: true,
+            toolChoice: 'auto',
+            temperature: 0.7,
+            topP: 0.95,
+            minP: 0.01,
+        );
+
+        return $codingAgent->initialize(new AgentRunner());
 
         // create contexts for each agent if not exists
+        /*
         if (is_null($this->contextManager->getContext('orchestrator_agent'))) {
             $this->contextManager->addContext(context: new Context(contextId: 'orchestrator_agent', context: [], isParent: true));
         }
@@ -47,15 +67,12 @@ class CodingAgent extends Agent
         if (is_null($this->contextManager->getContext('validator_agent'))) {
             $this->contextManager->addContext(context: new Context(contextId: 'validator_agent', context: [], isParent: false));
         }
-
-        if (is_null($this->contextManager->getContext('coding_agent'))) {
-            $this->contextManager->addContext(context: new Context(contextId: 'coding_agent', context: [], isParent: false));
-        }
+*/
 
         // Load system prompts for each agent
+        /*
         try {
             $validatorSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'validator_agent.txt');
-            $codingAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'coding_agent.txt');
             $searchAgentSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'search_agent.txt');
             $masterSystemMessage = $this->loadSystemPrompt($this->systemPromptsDir . 'orchestrator_agent.txt');
         } catch (\Exception $e) {
@@ -70,7 +87,8 @@ class CodingAgent extends Agent
         $this->contextManager->getContext('validator_agent')->setSystemMessage(new SystemMessage($validatorSystemMessage));
         $this->contextManager->getContext('coding_agent')->setSystemMessage(new SystemMessage($codingAgentSystemMessage));
 
-
+*/
+        /*
         try {
             $validator = new AgentRunner(
                 openAIService: $aiService,
@@ -123,7 +141,6 @@ class CodingAgent extends Agent
                 openAIService: $aiService,
                 contextManager: $this->contextManager,
                 agentName: 'Orchestrator',
-                agentId: 'orchestrator_agent',
                 model: '',
                 tools: [
                     new InformUserTool(),
@@ -148,12 +165,13 @@ class CodingAgent extends Agent
         } catch (\Exception $e) {
             throw new \Exception('Failed to initialize OrchestratorAgent: ' . $e->getMessage());
         }
+        */
     }
 
     private function loadSystemPrompt(string $filePath): string
     {
         if (!file_exists($filePath)) {
-            throw new \Exception('System prompt file not found: ' . $filePath);
+            throw new Exception('System prompt file not found: ' . $filePath);
         }
         return file_get_contents($filePath);
     }

@@ -4,11 +4,13 @@ namespace App\Command;
 
 use App\Entity\Discussion;
 use App\Factory\ContextPersistedFactory;
+use App\Model\Agent\CodingAgentFactory;
+use App\Model\Agent\CodingAgentInterface;
+use App\Model\Core\Agent\AgentRunner;
 use App\Model\Core\Message\Context;
 use App\Model\Core\Message\ContextManager;
 use App\Model\Core\Message\ContextWithIOTerminal;
 use App\Model\IO\Terminal;
-use App\Model\Agent\CodingAgentInterface;
 use App\Repository\DiscussionRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -23,8 +25,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class BasicChatCommand extends Command
 {
     public function __construct(
-        private readonly CodingAgentInterface $codingTeam,
-        private readonly ContextPersistedFactory $factory,
+        private readonly CodingAgentFactory $codingAgentFactory,
+        private readonly ContextPersistedFactory $contextPersistedFactory,
         private readonly DiscussionRepository $discussionRepository
     ) {
         parent::__construct();
@@ -37,9 +39,11 @@ class BasicChatCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+
+        // --- Select or create a discussion ---
         $discussionId = $this->selectDiscussion($io);
 
-        if ($discussionId === 0){
+        if ($discussionId === 0) {
             $discussion = new Discussion();
             $discussion->setTitle($io->ask('Enter a Discussion Title or hit Enter', 'Discussion ' . date('Y-m-d H:i:s')));
             $discussion->setUid(uniqid());
@@ -54,14 +58,25 @@ class BasicChatCommand extends Command
             }
         }
 
-        $context = new Context();
-        $contextPersistedWithIO = new ContextWithIOTerminal(context: $context, terminal: new Terminal($io));
-        $contextManagerPersisted = $this->factory->create(context: $contextPersistedWithIO, agentId: 'orchestrator_agent', discussion: $discussion); // Example discussion ID
 
-        $this->codingTeam->initialize(contextManager: $contextManagerPersistedWithIO);
 
-        // dump($contextManagerPersistedWithIO->getContext('orchestrator_agent'));
+        // --- Create a new context manager using a decorator pattern. ---
+        $contextManagerPersistedWithTerminal = $this->contextPersistedFactory->create(
+            context: new ContextWithIOTerminal(
+                context: new Context(),
+                terminal: new Terminal($io)
+            ),
+            agentId: 'coding_agent',
+            discussion: $discussion
+        );
 
+
+
+        // --- Initialize the coding agent with the context manager  ---
+        $codingAgentRunner = $this->codingAgentFactory->create($contextManagerPersistedWithTerminal);
+
+
+        // --- Start the chat loop ---
         while (true) {
             $prompt = $io->ask('You:');
             if ($prompt === '/exit' || $prompt === '/quit') {
@@ -72,7 +87,7 @@ class BasicChatCommand extends Command
                 continue;
             }
 
-            $this->codingTeam->sendMessage($prompt);
+            $codingAgentRunner->sendUserMessage($prompt);
         }
 
         return Command::SUCCESS;
@@ -80,7 +95,6 @@ class BasicChatCommand extends Command
 
     protected function selectDiscussion(SymfonyStyle $io): ?int
     {
-
         $discussions = $this->discussionRepository->findAll();
 
         if (empty($discussions)) {
@@ -97,6 +111,5 @@ class BasicChatCommand extends Command
         $discussionId = $io->ask('Please enter the discussion ID you want to use:');
 
         return is_numeric($discussionId) ? (int)$discussionId : throw new \InvalidArgumentException('Invalid discussion ID provided.');
-
     }
 }

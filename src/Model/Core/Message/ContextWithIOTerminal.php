@@ -32,6 +32,8 @@ readonly class ContextWithIOTerminal implements ContextInterface
                 }
             }
         }
+
+        return $this;
     }
 
     public function getContext(): array

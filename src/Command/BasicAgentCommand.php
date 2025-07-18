@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Interactive;
+use App\Model\Agent\CodingAgentFactory;
 use App\Model\IO\Terminal;
 use App\Model\Agent\CodingAgentInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -18,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class BasicAgentCommand extends Command
 {
-    public function __construct(private readonly CodingAgentInterface $codingTeam)
+    public function __construct(private readonly CodingAgentFactory $codingTeam)
     {
         parent::__construct();
     }
