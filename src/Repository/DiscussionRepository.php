@@ -22,7 +22,10 @@ class DiscussionRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-
+    public function persist(Discussion $discussion)
+    {
+        $this->getEntityManager()->persist($discussion);
+    }
 
 
 }

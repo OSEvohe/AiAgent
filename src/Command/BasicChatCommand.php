@@ -2,11 +2,16 @@
 
 namespace App\Command;
 
-use App\Factory\ContextManagerPersistedFactory;
+use App\Entity\Discussion;
+use App\Factory\ContextPersistedFactory;
+use App\Model\Agent\CodingAgentFactory;
+use App\Model\Agent\CodingAgentInterface;
+use App\Model\Core\Agent\AgentRunner;
+use App\Model\Core\Message\Context;
 use App\Model\Core\Message\ContextManager;
-use App\Model\Core\Message\ContextManagerWithIOTerminal;
+use App\Model\Core\Message\ContextWithIOTerminal;
 use App\Model\IO\Terminal;
-use App\Model\Team\CodingTeam;
+use App\Repository\DiscussionRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,8 +24,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class BasicChatCommand extends Command
 {
-    public function __construct(private readonly CodingTeam $codingTeam, private readonly ContextManagerPersistedFactory $factory)
-    {
+    public function __construct(
+        private readonly CodingAgentFactory $codingAgentFactory,
+        private readonly ContextPersistedFactory $contextPersistedFactory,
+        private readonly DiscussionRepository $discussionRepository
+    ) {
         parent::__construct();
     }
 
@@ -31,15 +39,44 @@ class BasicChatCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        // exemple using Decorator pattern to add IO and Persisting capabilities to the context manager
-        $contextManager = new ContextManager();
-        $contextManagerPersisted = $this->factory->create(contextManager: $contextManager, discussionId: '6878131721aaf'); // Example discussion ID
-        $contextManagerPersistedWithIO = new ContextManagerWithIOTerminal(contextManager: $contextManagerPersisted, terminal: new Terminal($io));
 
-        $this->codingTeam->initialize(contextManager: $contextManagerPersistedWithIO);
+        // --- Select or create a discussion ---
+        $discussionId = $this->selectDiscussion($io);
 
-        // dump($contextManagerPersistedWithIO->getContext('orchestrator_agent'));
+        if ($discussionId === 0) {
+            $discussion = new Discussion();
+            $discussion->setTitle($io->ask('Enter a Discussion Title or hit Enter', 'Discussion ' . date('Y-m-d H:i:s')));
+            $discussion->setUid(uniqid());
 
+            // Persist the new discussion but do not flush yet
+            $this->discussionRepository->persist($discussion);
+        } else {
+            $discussion = $this->discussionRepository->find($discussionId);
+            if (!$discussion) {
+                $io->error('Discussion not found.');
+                return Command::FAILURE;
+            }
+        }
+
+
+
+        // --- Create a new context manager using a decorator pattern. ---
+        $contextManagerPersistedWithTerminal = $this->contextPersistedFactory->create(
+            context: new ContextWithIOTerminal(
+                context: new Context(),
+                terminal: new Terminal($io)
+            ),
+            agentId: 'coding_agent',
+            discussion: $discussion
+        );
+
+
+
+        // --- Initialize the coding agent with the context manager  ---
+        $codingAgentRunner = $this->codingAgentFactory->create($contextManagerPersistedWithTerminal);
+
+
+        // --- Start the chat loop ---
         while (true) {
             $prompt = $io->ask('You:');
             if ($prompt === '/exit' || $prompt === '/quit') {
@@ -50,9 +87,29 @@ class BasicChatCommand extends Command
                 continue;
             }
 
-            $this->codingTeam->sendMessage($prompt);
+            $codingAgentRunner->sendUserMessage($prompt);
         }
 
         return Command::SUCCESS;
+    }
+
+    protected function selectDiscussion(SymfonyStyle $io): ?int
+    {
+        $discussions = $this->discussionRepository->findAll();
+
+        if (empty($discussions)) {
+            $io->writeln('No discussions found.');
+            return null;
+        }
+
+        $io->writeln('Available discussions:');
+        foreach ($discussions as $discussion) {
+            $io->writeln(sprintf('Discussion ID: %s, Title: %s, Uid: %s', $discussion->getId(), $discussion->getTitle(), $discussion->getUid()));
+        }
+        $io->writeln('0 : Create a new discussion');
+
+        $discussionId = $io->ask('Please enter the discussion ID you want to use:');
+
+        return is_numeric($discussionId) ? (int)$discussionId : throw new \InvalidArgumentException('Invalid discussion ID provided.');
     }
 }
