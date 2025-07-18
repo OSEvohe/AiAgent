@@ -8,6 +8,7 @@ use App\Model\Core\Mcp\McpClient;
 use App\Model\Core\Message\ContextInterface;
 use App\Model\Core\Message\SystemMessage;
 use App\Model\Core\Provider\OpenAIService;
+use App\Model\Core\Tool\AgentTool;
 use Exception;
 
 
@@ -22,34 +23,41 @@ class CodingAgentFactory
 
     /**
      * @throws Exception
+     * @var ContextInterface[] $contextManagers
      */
-    public function create(ContextInterface $contextManager): AgentRunner
+    public function create(array $contextManagers): AgentRunner
     {
-        // --- Initialize the Coding Agent context ---
-        $systemPromptsDir = $_ENV['AGENT_PROMPTS_DIR'] ?? '';
         $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
-        $mcps = McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'examples/coding_agent.json');
-        $tools = [];
+        $systemPromptsDir = $_ENV['AGENT_PROMPTS_DIR'] ?? '';
 
-        $contextManager->setSystemMessage(
-            systemMessage: new SystemMessage(
-                input: $this->loadSystemPrompt($systemPromptsDir . 'examples/coding_agent.txt')
-            )
+        $searchAgent = new Agent(
+            openAIService: $aiService,
+            contextManager: $contextManagers['search_agent']->setSystemMessage(new SystemMessage($this->loadSystemPrompt($systemPromptsDir . 'examples/search_agent.txt'))),
+            agentName: 'SearchAgent',
+            agentId: 'search_agent',
+            model: '',
+            tools: [],
+            mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'examples/search_agent.json'),
+            parallelToolCalls: true,
+            toolChoice: 'auto',
+            temperature: 0.15,
+            topP: 0.95,
+            minP: 0.01,
         );
 
 
         // --- Create the Coding Agent ---
         $codingAgent = new Agent(
             openAIService: $aiService,
-            contextManager: $contextManager,
+            contextManager: $contextManagers['coding_agent']->setSystemMessage(new SystemMessage($this->loadSystemPrompt($systemPromptsDir . 'examples/coding_agent.txt'))),
             agentName: 'CodingAgentFactory',
             agentId: 'coding_agent',
             model: '',
-            tools: $tools,
-            mcps: $mcps,
+            tools: [new AgentTool($searchAgent->initialize(new AgentRunner()), 'search_agent_tool', 'This agent can search online documentation and resources to find information. You must specify in the task argument to do a deep search if it is required')],
+            mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'examples/coding_agent.json'),
             parallelToolCalls: true,
             toolChoice: 'auto',
-            temperature: 0.7,
+            temperature: 0.15,
             topP: 0.95,
             minP: 0.01,
         );

@@ -6,7 +6,6 @@ use App\Entity\Discussion;
 use App\Factory\ContextPersistedFactory;
 use App\Model\Agent\CodingAgentFactory;
 use App\Model\Agent\CodingAgentInterface;
-use App\Model\Core\Agent\AgentRunner;
 use App\Model\Core\Message\Context;
 use App\Model\Core\Message\ContextManager;
 use App\Model\Core\Message\ContextWithIOTerminal;
@@ -59,21 +58,30 @@ class BasicChatCommand extends Command
         }
 
 
-
-        // --- Create a new context manager using a decorator pattern. ---
-        $contextManagerPersistedWithTerminal = $this->contextPersistedFactory->create(
-            context: new ContextWithIOTerminal(
-                context: new Context(),
-                terminal: new Terminal($io)
+        // --- Create a new context manager for each agent. ---
+        $contexts = [
+            'coding_agent' => $this->contextPersistedFactory->create(
+                context: new ContextWithIOTerminal(
+                    context: new Context(),
+                    terminal: new Terminal($io)
+                ),
+                agentId: 'coding_agent',
+                discussion: $discussion
             ),
-            agentId: 'coding_agent',
-            discussion: $discussion
-        );
+            'search_agent' => $this->contextPersistedFactory->create(
+                context: new ContextWithIOTerminal(
+                    context: new Context(),
+                    terminal: new Terminal($io),
+                    outputAssistant: false
+                ),
+                agentId: 'search_agent',
+                discussion: $discussion
+            )
+        ];
 
 
-
-        // --- Initialize the coding agent with the context manager  ---
-        $codingAgentRunner = $this->codingAgentFactory->create($contextManagerPersistedWithTerminal);
+        // --- Initialize the coding agent with context managers ---
+        $codingAgentRunner = $this->codingAgentFactory->create($contexts);
 
 
         // --- Start the chat loop ---

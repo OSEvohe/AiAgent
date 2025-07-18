@@ -63,6 +63,8 @@ readonly class ContextWithIOTerminal implements ContextInterface
 
     public function setSystemMessage(SystemMessage $systemMessage): ContextInterface
     {
-        return $this->context->setSystemMessage($systemMessage);
+        $this->context->setSystemMessage($systemMessage);
+
+        return $this;
     }
 }

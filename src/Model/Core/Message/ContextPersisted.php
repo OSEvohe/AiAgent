@@ -55,27 +55,6 @@ class ContextPersisted implements ContextInterface
         return $this->contextManager->toArray();
     }
 
-    public function loadDiscussion(): self
-    {
-        $contextEntries = $this->contextRepository->findBy(['discussion' => $this->discussion]);
-
-        $contexts = [];
-
-        // Initialize contexts from persisted entries splitting by agent ID
-        foreach ($contextEntries as $entry){
-           $contexts[$entry->getAgentId()][] = $entry->getData();
-        }
-
-        // foreach agent Id, create a Context object and fill it with the entries
-        foreach ($contexts as $agentId => $data) {
-            $context = new Context($agentId, $data);
-            $this->contextManager->addContext($context);
-        }
-
-
-        return $this;
-    }
-
     public function setContext(array $data): ContextInterface
     {
         return $this->contextManager->setContext($data);
@@ -86,8 +65,10 @@ class ContextPersisted implements ContextInterface
         return $this->contextManager->getSystemMessage();
     }
 
-    public function setSystemMessage(SystemMessage $systemMessage): ContextInterface
+    public function setSystemMessage(SystemMessage $systemMessage): self
     {
-        return $this->contextManager->setSystemMessage($systemMessage);
+        $this->contextManager->setSystemMessage($systemMessage);
+
+        return $this;
     }
 }
