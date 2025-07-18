@@ -1,7 +1,7 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #1a1a1a;
-    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+    color: #ffffff;
     margin: 0;
     padding: 0;
 }
@@ -9,6 +9,23 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+}
+.discussion-list {
+    background-color: #1a1a1a;
+    width: 250px;
+    overflow-y: auto;
+    padding: 1rem;
+    border-right: 1px solid #4b5563;
+}
+.new-discussion-btn {
+    background-color: #3b82f6;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+}
+.new-discussion-btn:hover {
+    background-color: #2563eb;
 }
 .chat-header {
     background-color: #2d2d2d;
@@ -21,12 +38,12 @@ body {
 .chat-header h1 {
     margin: 0;
 }
-.clear-chat-btn {
+.clear-chat-btn, .settings-btn {
     background: none;
     border: none;
     color: #e0e0e0;
 }
-.clear-chat-btn:hover {
+.clear-chat-btn:hover, .settings-btn:hover {
     color: #ffffff;
 }
 .chat-messages {
@@ -43,6 +60,7 @@ body {
     margin-bottom: 0.5rem;
     border-radius: 0.5rem;
     position: relative;
+    word-wrap: break-word;
 }
 .user-message {
     background-color: #3b82f6;
@@ -92,3 +110,26 @@ body {
 #sendButton:disabled {
     background-color: #4b5563;
 }
+.typing-indicator {
+    display: none;
+    align-self: flex-start;
+    margin-top: 0.5rem;
+}
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 3px;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    animation: typing 1.5s infinite;
+}
+@keyframes typing {
+    0%, 20% { opacity: 0; }
+    40% { opacity: 1; }
+}
+::selection { background: #3b82f6; color: #000; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #1a1a1a; }
+::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #6b7280; }

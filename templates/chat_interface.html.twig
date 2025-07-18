@@ -8,16 +8,26 @@
 </head>
 <body>
     <div class="chat-container">
+        <aside class="discussion-list">
+            <button class="new-discussion-btn">New Discussion</button>
+            <!-- Discussion items will be added here -->
+        </aside>
         <header class="chat-header">
             <h1>AI Chat</h1>
             <button class="clear-chat-btn">Clear Chat</button>
+            <button class="settings-btn">⚙️</button>
         </header>
         <main class="chat-messages" id="chatMessages">
             <!-- Messages will be added here -->
         </main>
         <footer class="chat-input">
-            <textarea id="messageInput" placeholder="Type your message here..." rows="1"></textarea>
+            <textarea id="messageInput" placeholder="Type your message here..." rows="5"></textarea>
             <button id="sendButton" disabled>Send</button>
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </footer>
     </div>
     <script src="scripts.js"></script>
