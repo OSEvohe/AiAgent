@@ -33,3 +33,9 @@
 - Core: Provider (OpenAIService.php, OpenAIServiceInterface.php), Tool (ToolsHandler.php, AITool.php, AgentTool.php), Message (ToolResultResponse.php, SystemMessage.php, UserMessage.php), Agent (AgentRunner.php, Team.php, MessageContextTrait.php), Team, IOInterface.php, Mcp (McpClient.php, McpTool.php, McpsPool.php)
 - Tool: InformUserTool.php, WeatherTool.php
 - Team: CodingTeam.php
+
+## New Feature: Persisted Discussions
+- Added ability to persist Discussions in database.
+- This allows continuing previous discussions.
+- See src/Model/Core/Message/ContextManagerPersisted.php and related classes.
+- For more details, see commit c7c0bc567499c5efe120b654eb342291ff9bc5df.

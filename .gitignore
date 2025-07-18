@@ -1,13 +1,41 @@
-/.idea/
-
 ###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
+
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+###> symfony/phpunit-bridge ###
+.phpunit
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/web-server-bundle ###
+/.web-server-pid
+###< symfony/web-server-bundle ###
+/nbproject/private/
+/nbproject/
+
+.idea/
+###> symfony/webpack-encore-pack ###
+/node_modules/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-pack ###
+/public/uploads/
+/public/bundle/
+
+public/bundles/adminlte
+
+public/bundles/
+/.env.local
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor
+###< symfony/asset-mapper ###
 /config/agents/extensions/
 /src/Model/Extensions/
