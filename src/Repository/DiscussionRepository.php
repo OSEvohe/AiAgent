@@ -27,5 +27,11 @@ class DiscussionRepository extends ServiceEntityRepository
         $this->getEntityManager()->persist($discussion);
     }
 
+    public function remove(Discussion $discussion)
+    {
+        $this->getEntityManager()->remove($discussion);
+        $this->getEntityManager()->flush();
+    }
+
 
 }
