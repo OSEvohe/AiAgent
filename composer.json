@@ -12,7 +12,9 @@
         "doctrine/doctrine-bundle": "*",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.5",
+        "erusev/parsedown": "^1.7",
         "guzzlehttp/guzzle": "^7.9.3",
+        "michelf/php-markdown": "^2.0",
         "nyholm/psr7": "^1.8.2",
         "openai-php/client": "^0.14.0",
         "php-mcp/client": "^1.0.1",
@@ -20,14 +22,20 @@
         "react/http": ">=1.11",
         "react/promise": ">=3.2",
         "react/socket": "^1.16",
+        "symfony/asset": "7.3.*",
+        "symfony/asset-mapper": "7.3.*",
         "symfony/console": "7.3.*",
+        "symfony/doctrine-messenger": "7.3.*",
         "symfony/dotenv": "7.3.*",
         "symfony/flex": "^2.8.1",
         "symfony/framework-bundle": "7.3.*",
         "symfony/http-client": "^7.3.1",
         "symfony/messenger": "7.3.*",
         "symfony/runtime": "7.3.*",
+        "symfony/security-bundle": "7.3.*",
+        "symfony/stimulus-bundle": "^2.27",
         "symfony/twig-bundle": "7.3.*",
+        "symfony/ux-live-component": "^2.27",
         "symfony/yaml": "7.3.*",
         "twig/twig": "^3.21.1",
         "voryx/websocketmiddleware": "^2.0.1"
@@ -64,7 +72,8 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"
@@ -83,6 +92,8 @@
         }
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.64"
+        "symfony/maker-bundle": "^1.64",
+        "symfony/stopwatch": "7.3.*",
+        "symfony/web-profiler-bundle": "7.3.*"
     }
 }

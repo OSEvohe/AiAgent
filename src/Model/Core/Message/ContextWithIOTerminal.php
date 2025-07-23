@@ -19,8 +19,6 @@ readonly class ContextWithIOTerminal implements ContextInterface
     {
         $this->context->addEntry($entry);
 
-        // dump($entry, $agentId);
-
         if (($entry['role'] ?? false) && $entry['role'] === 'assistant') {
             if (isset($entry['content']) && $this->outputAssistant) {
                 $this->terminal->output($this->agentDisplayName . ': ' . $entry['content']);

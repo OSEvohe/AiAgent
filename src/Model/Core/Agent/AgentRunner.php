@@ -45,6 +45,8 @@ class AgentRunner
             'temperature' => $this->agent->getTemperature(),
             'top_p' => $this->agent->getTopP(),
             'min_p' => $this->agent->getMinP(),
+            'top_k' => $this->agent->getTopk(),
+            'repeat_penalty' => $this->agent->getRepeatPenalty(),
             'tool_choice' => $this->agent->getToolChoice(),
             'parallel_tool_calls' => $this->agent->isParallelToolCalls(),
         ];
@@ -65,7 +67,7 @@ class AgentRunner
                 $responseContent = $choice->message->content;
             }
 
-            if ($choice->message->toolCalls) {
+            if ($choice->message->toolCalls && $step <= 10) {
                 $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
                 $this->contextManager->addEntry($toolResult->toArray());
                 $responseContent = $this->processResponse($step + 1);

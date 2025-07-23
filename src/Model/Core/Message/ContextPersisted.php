@@ -11,27 +11,32 @@ class ContextPersisted implements ContextInterface
 {
     public function __construct(
         private readonly ContextInterface $contextManager,
-        //private readonly DiscussionRepository $discussionRepository,
+        private readonly DiscussionRepository $discussionRepository,
         private readonly ContextRepository $contextRepository,
-        private ?Discussion $discussion,
+        private int $discussionId,
         private string $agentId
     ) {
-        /*if ($discussion === null) {
-            $this->discussion = new Discussion();
-            $this->discussion->setUid(uniqid());
-            $this->discussion->setTitle('Discussion ' . date('Y-m-d H:i:s'));
-            $this->discussionRepository->save($this->discussion);
-        }*/
     }
 
     public function addEntry(array $entry): self
     {
+
+        $discussion = $this->discussionRepository->find($this->discussionId);
+
+        if ($discussion) {
+            $entries = $this->contextRepository->findBy(['discussion' => $discussion]);
+            $this->setContext((array_map(fn($entry) => $entry->getData(), $entries)));
+        } else {
+            throw new \InvalidArgumentException('Discussion not found for ID: ' . $this->discussionId);
+        }
+
+
         $this->contextManager->addEntry($entry);
 
         $newContextEntity = new ContextEntity();
         $newContextEntity->setAgentId($this->agentId)
             ->setCreatedAt(new \DateTimeImmutable())
-            ->setDiscussion($this->discussion)
+            ->setDiscussion($discussion)
             ->setRole($entry['role'])
             ->setData($entry);
 
@@ -69,6 +74,17 @@ class ContextPersisted implements ContextInterface
     {
         $this->contextManager->setSystemMessage($systemMessage);
 
+        return $this;
+    }
+
+    public function getDiscussionId(): int
+    {
+        return $this->discussionId;
+    }
+
+    public function setDiscussionId(int $discussionId): self
+    {
+        $this->discussionId = $discussionId;
         return $this;
     }
 }

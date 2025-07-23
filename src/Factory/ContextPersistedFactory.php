@@ -11,25 +11,19 @@ use App\Repository\DiscussionRepository;
 readonly class ContextPersistedFactory
 {
     public function __construct(
-        private ContextRepository $contextRepository
+        private ContextRepository $contextRepository,
+        private DiscussionRepository $discussionRepository
     ) {
     }
 
-    public function create(ContextInterface $context, string $agentId, Discussion $discussion): ContextPersisted
+    public function create(ContextInterface $context, string $agentId, int $discussionId): ContextPersisted
     {
-        $context = new ContextPersisted(
+        return new ContextPersisted(
             contextManager: $context,
+            discussionRepository: $this->discussionRepository,
             contextRepository: $this->contextRepository,
-            discussion: $discussion,
+            discussionId: $discussionId,
             agentId: $agentId
         );
-
-        // If the discussion is persisted, we can load the existing context entries
-        if ($discussion->getId() !== null) {
-            $entries = $this->contextRepository->findBy(['discussion' => $discussion]);
-            $context->setContext(array_map(fn($entry) => $entry->getData(), $entries));
-        }
-
-        return $context;
     }
 }

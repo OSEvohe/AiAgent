@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="chat-container d-flex flex-column vh-100">
+        <header class="chat-header">
+            <h1>AI Chat</h1>
+            <div class="header-buttons">
+                <button class="settings-btn">⚙️</button>&#x1f600;
+            </div>
+        </header>
+        <main class="chat-main small">
+            <aside class="discussion-list overflow-x-hidden" style="min-width: 300px">
+                <div class="discussion ps-3" style="width:400px; min-width: 300px">
+                    {{ component('DiscussionAreaComponent') }}
+                </div>
+            </aside>
+                {{ component('MessageAreaComponent') }}
+        </main>
+        {{ component('InputAreaComponent') }}
+    </div>
+{% endblock %}
