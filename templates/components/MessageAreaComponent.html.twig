@@ -1,27 +1,47 @@
-<div {{ attributes }} data-poll="delay(1000)|$render">
+<section data-action="scroll->message-area#scrolling" data-message-area-target="messageArea" class="message-area py-5 px-3" id="chatMessages"
+         style="position: relative" {{ attributes.defaults(stimulus_controller('message-area')) }} data-poll="delay(2000)|$render">
     {% for entry in this.messages %}
         {% if entry.role == 'assistant' and entry.data.tool_calls is defined and entry.data.tool_calls|length > 0 %}
-            <div class="message-wrapper ai-message-wrapper">
-                <div class="message tool-message">
-                    <p><strong>&#x1F6E0;</strong> {{ entry.data.tool_calls[0].function.name }}</p>
+            <div class="row">
+                <div class="col-sm-12 col-xl-7 offset-xl-2">
+                    <div class="message-wrapper ai-message-wrapper float-start">
+                        <div class="message tool-message" data-live-ignore>
+                            <p><strong>&#x1F6E0;</strong> {{ entry.data.tool_calls[0].function.name }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endif %}
 
         {% if entry.role == 'user' %}
-            <div class="message-wrapper user-message-wrapper">
-                <div class="message user-message">
-                    <p>{{ entry.data.content|raw|nl2br }}</p>
+            <div class="row">
+                <div class="col-sm-12 col-xl-7 offset-xl-4 text-right">
+                    <div class="message-wrapper user-message-wrapper float-end">
+                        <div class="message user-message" data-live-ignore>
+                            {{ this.markdown(entry.data.content)|raw }}
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endif %}
 
         {% if entry.role == 'assistant' and entry.data.content is not null %}
-            <div class="message-wrapper ai-message-wrapper">
-                <div class="message ai-message">
-                    <p>{{ entry.data.content|raw|nl2br }}</p>
+            <div class="row" data-live-ignore>
+                <div class="col-sm-12 col-xl-7 offset-xl-1">
+                    <div class="message-wrapper ai-message-wrapper float-start">
+                        <div class="message ai-message" data-live-ignore>
+                            {{ this.markdown(entry.data.content)|raw }}
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endif %}
     {% endfor %}
-</div>
+    <button data-message-area-target="scrollToBottomButton" class="d-none" data-action="click->message-area#scrollToBottom" id="scroll-to-bottom"
+            style="position: fixed; bottom: 20vh ; right: 20px; background: #000; border-radius: 50%; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </button>
+</section>

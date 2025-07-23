@@ -1,5 +1,5 @@
-<footer class="chat-input" {{ attributes }}>
-    <textarea id="messageInput" placeholder="Type your message here..." rows="5" data-model="message"></textarea>
+<footer class="chat-input" {{ attributes.defaults(stimulus_controller('input-message')) }}>
+    <textarea data-input-message-target="messageInput" id="messageInput" placeholder="Type your message here..." rows="5" data-model="message"></textarea>
     <button id="sendButton" data-action="live#action" data-live-action-param="sendMessage">Send</button>
     <div class="typing-indicator" id="typingIndicator">
         <span></span>

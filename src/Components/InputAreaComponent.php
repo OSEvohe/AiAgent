@@ -37,5 +37,7 @@ class InputAreaComponent
 
         // Dispatch the command using the message bus
         $this->messageBus->dispatch($command);
+
+        $this->message = ''; // Clear the message input after sending
     }
 }

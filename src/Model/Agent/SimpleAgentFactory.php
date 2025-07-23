@@ -13,7 +13,7 @@ use Exception;
 
 
 /**
- * This is an example of a coding agent defined programmatically using a php class
+ * This is an example of a search agent defined programmatically using a php class
  * This class work like a Factory for Agent Class */
 class SimpleAgentFactory
 {
@@ -44,6 +44,8 @@ class SimpleAgentFactory
             temperature: 0.5,
             topP: 0.95,
             minP: 0.01,
+            topk: 64,
+            repeatPenalty: 1.0,
         );
 
         return $codingAgent->initialize(new AgentRunner());

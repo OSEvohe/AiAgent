@@ -32,4 +32,8 @@ interface AgentInterface
     public function getTopP(): float;
 
     public function getMinP(): float;
+
+    public function getTopk(): int;
+
+    public function getRepeatPenalty(): float;
 }

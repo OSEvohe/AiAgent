@@ -1,26 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('/styles.css') }}">
-{% endblock %}
-
 {% block body %}
-    <div class="chat-container">
+    <div class="chat-container d-flex flex-column vh-100">
         <header class="chat-header">
             <h1>AI Chat</h1>
             <div class="header-buttons">
                 <button class="settings-btn">⚙️</button>&#x1f600;
             </div>
         </header>
-        <main class="chat-main">
-            <aside class="discussion-list">
-                <button class="new-discussion-btn">New Discussion</button>
-                <!-- Discussion items will be added here -->
+        <main class="chat-main small">
+            <aside class="discussion-list overflow-x-hidden" style="min-width: 300px">
+                <div class="discussion ps-3" style="width:400px; min-width: 300px">
+                    {{ component('DiscussionAreaComponent') }}
+                </div>
             </aside>
-            <section class="message-area" id="chatMessages">
                 {{ component('MessageAreaComponent') }}
-            </section>
         </main>
-           {{ component('InputAreaComponent') }}
+        {{ component('InputAreaComponent') }}
     </div>
 {% endblock %}

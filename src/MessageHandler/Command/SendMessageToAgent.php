@@ -4,6 +4,9 @@ namespace App\MessageHandler\Command;
 
 use Symfony\Component\Messenger\Attribute\AsMessage;
 
+/**
+ * @see SendMessageToAgentHandler
+ */
 #[AsMessage('async')]
 readonly class SendMessageToAgent
 {

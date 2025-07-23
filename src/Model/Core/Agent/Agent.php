@@ -20,6 +20,8 @@ class Agent implements AgentInterface
         private float $temperature = 0.7,
         private float $topP = 0.95,
         private float $minP = 0.01,
+        private int $topk = 40,
+        private float $repeatPenalty = 1.0
     ) {
     }
 
@@ -88,5 +90,15 @@ class Agent implements AgentInterface
     public function getTemperature(): float
     {
         return $this->temperature;
+    }
+
+    public function getTopk(): int
+    {
+        return $this->topk;
+    }
+
+    public function getRepeatPenalty(): float
+    {
+        return $this->repeatPenalty;
     }
 }

@@ -36,7 +36,7 @@ What is the capital of the country with the largest population?
 
 ### Agent (Step-by-step reasoning):
 1. The user wants the capital of the most populous country.
-2. I need to identify which country has the largest population.
+2. I need to identify which country has the largest population by searching on internet
 3. China is the most populous country.
 4. The capital of China is Beijing.
 
@@ -49,3 +49,7 @@ The capital of the country with the largest population (China) is Beijing.
 - Always break down the problem into steps.
 - Search for information if you do not know the answer.
 - Clearly state your reasoning before giving the final answer.
+
+
+## Additional Notes
+- If search tool return an error, do not try again, you are rate limited.

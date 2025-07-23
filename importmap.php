@@ -16,13 +16,37 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
-    '@hotwired/stimulus' => [
-        'version' => '3.2.2',
-    ],
     '@symfony/stimulus-bundle' => [
         'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
     ],
     '@symfony/ux-live-component' => [
         'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
+    ],
+    '@hotwired/stimulus' => [
+        'version' => '3.2.2',
+    ],
+    'bootstrap' => [
+        'version' => '5.3.7',
+    ],
+    '@popperjs/core' => [
+        'version' => '2.11.8',
+    ],
+    'bootstrap/dist/css/bootstrap.min.css' => [
+        'version' => '5.3.7',
+        'type' => 'css',
+    ],
+    'marked' => [
+        'version' => '16.1.1',
+    ],
+    'highlight.js' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/styles/monokai-sublime.css' => [
+        'version' => '11.11.1',
+        'type' => 'css',
+    ],
+    'highlight.js/styles/atom-one-dark.css' => [
+        'version' => '11.11.1',
+        'type' => 'css',
     ],
 ];
