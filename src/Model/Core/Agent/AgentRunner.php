@@ -67,7 +67,7 @@ class AgentRunner
                 $responseContent = $choice->message->content;
             }
 
-            if ($choice->message->toolCalls && $step <= 10) {
+            if ($choice->message->toolCalls && $step <= 99) {
                 try {
                     $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
                     $this->contextManager->addEntry($toolResult->toArray());
