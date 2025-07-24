@@ -35,7 +35,8 @@ class InputAreaComponent
         // Create a command to send the message to the agent
         $command = new SendMessageToAgent(
             discussionUid: $this->discussionUid,
-            message: $this->message
+            message: $this->message,
+            messageUid: uniqid()
         );
 
         // Dispatch the command using the message bus

@@ -1,6 +1,6 @@
 <div {{ attributes }}>
     <div class="ps-3 py-2 ">
-        <button class="new-discussion-btn text-center">Nouvelle Discussion</button>
+        <button class="new-discussion-btn text-center" data-action="live#action" data-live-action-param="createDiscussion">Nouvelle Discussion</button>
     </div>
 
     <ul class="discussion-list list-unstyled">
@@ -14,7 +14,7 @@
                         href="{{ path("app_chat_index", {'discussionUid' : discussion.uid}) }}">{{ discussion.title }}</a>
                 <span>
                         <button class="btn btn-sm" data-action="live#action" data-live-action-param="deleteDiscussion"
-                                data-live-discussion-id-param="{{ discussion.id }}">
+                                data-live-discussion-uid-param="{{ discussion.uid }}">
                             🗑️
                         </button>
                     </span>

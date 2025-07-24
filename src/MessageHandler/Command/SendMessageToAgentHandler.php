@@ -44,7 +44,7 @@ class SendMessageToAgentHandler
         }
         $this->contexts['coding_agent']->setDiscussionId($command->discussionUid);
         $this->contexts['search_agent']->setDiscussionId($command->discussionUid);
-        $this->codingAgentRunner->sendUserMessage($command->message);
+        $this->codingAgentRunner->sendUserMessage($command->message, $command->messageUid);
     }
 
 }

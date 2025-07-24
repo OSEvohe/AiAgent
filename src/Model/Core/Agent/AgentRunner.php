@@ -25,10 +25,10 @@ class AgentRunner
         return new UserMessage($userInput);
     }
 
-    public function sendUserMessage(string $userInput): string
+    public function sendUserMessage(string $userInput, string $messageUid): string
     {
         try {
-            $this->contextManager->addEntry($this->createUserMessage($userInput)->toArray());
+            $this->contextManager->addEntry($this->createUserMessage($userInput)->toArray(), $messageUid);
 
             return $this->processResponse();
         } catch (Exception $e) {
@@ -68,9 +68,13 @@ class AgentRunner
             }
 
             if ($choice->message->toolCalls && $step <= 10) {
-                $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
-                $this->contextManager->addEntry($toolResult->toArray());
-                $responseContent = $this->processResponse($step + 1);
+                try {
+                    $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
+                    $this->contextManager->addEntry($toolResult->toArray());
+                    $responseContent = $this->processResponse($step + 1);
+                } catch (Exception $e) {
+                    return 'Error executing tool: ' . $e->getMessage();
+                }
             }
         }
 

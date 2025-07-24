@@ -2,8 +2,11 @@
 
 namespace App\Components;
 
+use App\Entity\Discussion;
 use App\Repository\ContextRepository;
 use App\Repository\DiscussionRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -11,7 +14,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 #[AsLiveComponent]
-class DiscussionAreaComponent
+class DiscussionAreaComponent extends AbstractController
 {
     use DefaultActionTrait;
 
@@ -36,6 +39,19 @@ class DiscussionAreaComponent
         if ($discussion) {
             $this->discussionRepository->remove($discussion);
         }
+    }
+
+
+    #[LiveAction]
+    public function createDiscussion(): RedirectResponse
+    {
+        $discussion = new Discussion();
+        $discussion->setTitle('Discussion'. Date('Y-m-d H:i:s'))
+            ->setUid(uniqid());
+
+        $this->discussionRepository->save($discussion);
+
+        return $this->redirectToRoute('app_chat_index', ['discussionUid' => $discussion->getUid()]);
     }
 
 

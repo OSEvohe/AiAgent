@@ -12,7 +12,8 @@ readonly class SendMessageToAgent
 {
     public function __construct(
         public string $discussionUid,
-        public string $message
+        public string $message,
+        public string $messageUid = ''
     )
     {
     }

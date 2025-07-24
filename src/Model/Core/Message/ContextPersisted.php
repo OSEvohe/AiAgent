@@ -17,7 +17,7 @@ class ContextPersisted implements ContextInterface
     ) {
     }
 
-    public function addEntry(array $entry): string
+    public function addEntry(array $entry, string $entryUid = ''): string
     {
         $discussion = $this->discussionRepository->findByUid($this->discussionUid);
 
@@ -28,7 +28,7 @@ class ContextPersisted implements ContextInterface
             throw new \InvalidArgumentException('Discussion not found for ID: ' . $this->discussionUid);
         }
 
-        $uniquid = $this->contextManager->addEntry($entry);
+        $uniquid = $this->contextManager->addEntry($entry, $entryUid);
 
         $newContextEntity = new ContextEntity();
         $newContextEntity->setAgentId($this->agentId)

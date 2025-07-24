@@ -15,9 +15,9 @@ readonly class ContextWithIOTerminal implements ContextInterface
     ) {
     }
 
-    public function addEntry(array $entry): string
+    public function addEntry(array $entry, string $entryUid = ''): string
     {
-        $uniqId = $this->context->addEntry($entry);
+        $uniqId = $this->context->addEntry($entry, $entryUid);
 
         if (($entry['role'] ?? false) && $entry['role'] === 'assistant') {
             if (isset($entry['content']) && $this->outputAssistant) {

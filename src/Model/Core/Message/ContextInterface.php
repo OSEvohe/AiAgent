@@ -21,7 +21,7 @@ interface ContextInterface
      * Adds an entry to context
      * @param array $entry
      */
-    public function addEntry(array $entry): string;
+    public function addEntry(array $entry, string $entryUid = ''): string;
 
     /**
      * Gets an entry from context by key.
