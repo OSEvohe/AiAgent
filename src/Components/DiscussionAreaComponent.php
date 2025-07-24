@@ -16,25 +16,25 @@ class DiscussionAreaComponent
     use DefaultActionTrait;
 
     #[LiveProp(url: true)]
-    public int $discussionId = 0;
+    public string $discussionUid = '';
 
     public function __construct(
         private readonly DiscussionRepository $discussionRepository)
     {
     }
 
-    public function getDicussions(): array
+    public function getDiscussions(): array
     {
         return $this->discussionRepository->findAll();
     }
 
     #[LiveAction]
-    public function deleteDiscussion(#[LiveArg] int $discussionId): void
+    public function deleteDiscussion(#[LiveArg] string $discussionUid): void
     {
-        $discussion = $this->discussionRepository->find($discussionId);
+        $discussion = $this->discussionRepository->findByUid($discussionUid);
 
         if ($discussion) {
-            $this->discussionRepository->remove($discussion, true);
+            $this->discussionRepository->remove($discussion);
         }
     }
 

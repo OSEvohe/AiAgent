@@ -16,7 +16,7 @@ class InputAreaComponent
     use DefaultActionTrait;
 
     #[LiveProp(url: true)]
-    public int $discussionId = 0;
+    public string $discussionUid = '';
 
     #[LiveProp(writable: true)]
     public string $message = '';
@@ -33,7 +33,10 @@ class InputAreaComponent
     public function sendMessage(): void
     {
         // Create a command to send the message to the agent
-        $command = new SendMessageToAgent($this->discussionId, $this->message);
+        $command = new SendMessageToAgent(
+            discussionUid: $this->discussionUid,
+            message: $this->message
+        );
 
         // Dispatch the command using the message bus
         $this->messageBus->dispatch($command);

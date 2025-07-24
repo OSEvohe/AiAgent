@@ -39,3 +39,7 @@ public/bundles/
 ###< symfony/asset-mapper ###
 /config/agents/extensions/
 /src/Model/Extensions/
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###

@@ -4,18 +4,23 @@
     </div>
 
     <ul class="discussion-list list-unstyled">
-        {% for discussion in this.dicussions %}
-            <li class="discussion-item" data-discussion-id="{{ discussion.id }}">
-                <span class="discussion-title">
-                    {{ discussion.id }}. <a
-                            href="{{ path("app_chat_index", {'discussionId' : discussion.id}) }}">{{ discussion.title }}</a>
-                    <span>
-                        <button class="btn btn-sm" data-action="live#action" data-live-action-param="deleteDiscussion" data-live-discussion-id-param="{{ discussion.id }}">
+        {% for discussion in this.discussions %}
+            <li class="discussion-item">
+            <span class="discussion-title">
+            {% if this.discussionUid == discussion.uid %}
+                <strong>{{ discussion.id }}. {{ discussion.title }}</strong>
+        {% else %}
+                {{ discussion.id }}. <a
+                        href="{{ path("app_chat_index", {'discussionUid' : discussion.uid}) }}">{{ discussion.title }}</a>
+                <span>
+                        <button class="btn btn-sm" data-action="live#action" data-live-action-param="deleteDiscussion"
+                                data-live-discussion-id-param="{{ discussion.id }}">
                             🗑️
                         </button>
                     </span>
                 </span>
-            </li>
+                </li>
+            {% endif %}
         {% else %}
             <li class="no-discussions">No discussions available.</li>
         {% endfor %}

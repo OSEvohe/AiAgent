@@ -1,0 +1,289 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method App\\Components\\DiscussionAreaComponent\:\:getDicussions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Components/DiscussionAreaComponent.php
+
+		-
+			message: '#^Method App\\Components\\MessageAreaComponent\:\:getMessages\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Components/MessageAreaComponent.php
+
+		-
+			message: '#^Method App\\Entity\\Context\:\:getData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/Context.php
+
+		-
+			message: '#^Method App\\Entity\\Context\:\:setData\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/Context.php
+
+		-
+			message: '#^Property App\\Entity\\Context\:\:\$data type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/Context.php
+
+		-
+			message: '#^Property App\\MessageHandler\\Command\\SendMessageToAgentHandler\:\:\$contexts type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/MessageHandler/Command/SendMessageToAgentHandler.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Agent\\Agent\:\:__construct\(\) has parameter \$mcps with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Agent/Agent.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Agent\\Agent\:\:__construct\(\) has parameter \$tools with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Agent/Agent.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Agent\\Agent\:\:getMcps\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Agent/Agent.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Agent\\Agent\:\:getTools\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Agent/Agent.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Agent\\AgentInterface\:\:getMcps\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Agent/AgentInterface.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Agent\\AgentInterface\:\:getTools\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Agent/AgentInterface.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Agent\\AgentRunner\:\:processContext\(\) return type with generic class OpenAI\\Responses\\StreamResponse does not specify its types\: TResponse$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Model/Core/Agent/AgentRunner.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Agent\\AgentRunner\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Agent/AgentRunner.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Mcp\\McpClient\:\:__construct\(\) has parameter \$excludedTools with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Mcp/McpClient.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Mcp\\McpClient\:\:__construct\(\) has parameter \$includedTools with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Mcp/McpClient.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Mcp\\McpClient\:\:callTool\(\) has parameter \$arguments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Mcp/McpClient.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Mcp\\McpClient\:\:createServerConfig\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Mcp/McpClient.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Mcp\\McpClient\:\:fromJsonConfig\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Mcp/McpClient.php
+
+		-
+			message: '#^Property App\\Model\\Core\\Mcp\\McpsPool\:\:\$mcps type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Mcp/McpsPool.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\Context\:\:__construct\(\) has parameter \$context with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/Context.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\Context\:\:addEntry\(\) has parameter \$entry with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/Context.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\Context\:\:getContext\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/Context.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\Context\:\:getEntry\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/Context.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\Context\:\:setContext\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/Context.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\Context\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/Context.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextInterface\:\:addEntry\(\) has parameter \$entry with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextInterface.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextInterface\:\:getContext\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextInterface.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextInterface\:\:getEntry\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextInterface.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextInterface\:\:setContext\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextInterface.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextInterface\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextInterface.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextPersisted\:\:addEntry\(\) has parameter \$entry with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextPersisted.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextPersisted\:\:getContext\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextPersisted.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextPersisted\:\:getEntry\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextPersisted.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextPersisted\:\:setContext\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextPersisted.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextPersisted\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextPersisted.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextWithIOTerminal\:\:addEntry\(\) has parameter \$entry with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextWithIOTerminal.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextWithIOTerminal\:\:getContext\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextWithIOTerminal.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextWithIOTerminal\:\:getEntry\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextWithIOTerminal.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextWithIOTerminal\:\:setContext\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextWithIOTerminal.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ContextWithIOTerminal\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ContextWithIOTerminal.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\SystemMessage\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/SystemMessage.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ToolResultResponse\:\:fromArray\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ToolResultResponse.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\ToolResultResponse\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/ToolResultResponse.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Message\\UserMessage\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Message/UserMessage.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Provider\\OpenAIService\:\:getModels\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Model/Core/Provider/OpenAIService.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Provider\\OpenAIService\:\:sendToLlm\(\) return type with generic class OpenAI\\Responses\\StreamResponse does not specify its types\: TResponse$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Model/Core/Provider/OpenAIService.php
+
+		-
+			message: '#^Method App\\Model\\Core\\Provider\\OpenAIServiceInterface\:\:sendToLlm\(\) return type with generic class OpenAI\\Responses\\StreamResponse does not specify its types\: TResponse$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Model/Core/Provider/OpenAIServiceInterface.php

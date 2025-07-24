@@ -17,18 +17,20 @@ class MessageAreaComponent
     use DefaultActionTrait;
 
     #[LiveProp(url: true)]
-    public int $discussionId = 0;
+    public string $discussionUid = '';
 
     public function __construct(
-        private readonly ContextRepository $contextRepository,)
+        private readonly ContextRepository $contextRepository,
+        private readonly DiscussionRepository $discussionRepository,
+    )
     {
     }
 
     public function getMessages(): array
     {
-        $results =  $this->contextRepository->findBy(['discussion' => $this->discussionId]);
+        $discussion = $this->discussionRepository->findByUid($this->discussionUid);
 
-        return $results;
+        return $this->contextRepository->findBy(['discussion' => $discussion], ['createdAt' => 'ASC']);
     }
 
     public function getMarkdown(string $text): string

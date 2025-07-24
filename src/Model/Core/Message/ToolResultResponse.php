@@ -7,7 +7,7 @@ class ToolResultResponse
     private function __construct(
         private readonly string $toolCallId,
         private readonly string $toolName = '',
-        private readonly ?string $content
+        private readonly ?string $content = null
     ) {
     }
 

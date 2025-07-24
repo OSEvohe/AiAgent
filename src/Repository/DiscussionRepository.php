@@ -22,15 +22,24 @@ class DiscussionRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function persist(Discussion $discussion)
+    public function persist(Discussion $discussion): void
     {
         $this->getEntityManager()->persist($discussion);
     }
 
-    public function remove(Discussion $discussion)
+    public function remove(Discussion $discussion): void
     {
         $this->getEntityManager()->remove($discussion);
         $this->getEntityManager()->flush();
+    }
+
+    public function findByUid(string $discussionUid): ?Discussion
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.uid = :uid')
+            ->setParameter('uid', $discussionUid)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
 

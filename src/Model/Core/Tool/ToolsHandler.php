@@ -2,7 +2,6 @@
 
 namespace App\Model\Core\Tool;
 
-use App\Model\Core\IOInterface;
 use App\Model\Core\Mcp\McpClient;
 use App\Model\Core\Mcp\McpTool;
 use App\Model\Core\Message\ToolResultResponse;
@@ -30,10 +29,10 @@ class ToolsHandler
 
     /**
      * @param CreateResponseToolCall[] $toolCalls
+     * @return ToolResultResponse[]
      */
-    public function handleToolCalls(
-        array $toolCalls
-    ): array {
+    public function handleToolCalls(array $toolCalls): array
+    {
         $resultCalls = [];
 
         foreach ($toolCalls as $toolCall) {
@@ -60,6 +59,9 @@ class ToolsHandler
         throw new Exception("Tool not found: " . $toolCall->function->name);
     }
 
+    /**
+     * @return AITool[]
+     */
     public function getTools(): array
     {
         return $this->toolsEnabled ? $this->tools : [];

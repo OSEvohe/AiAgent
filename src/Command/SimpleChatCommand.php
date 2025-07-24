@@ -10,6 +10,7 @@ use App\Model\Core\Message\Context;
 use App\Model\Core\Message\ContextWithIOTerminal;
 use App\Model\IO\Terminal;
 use App\Repository\DiscussionRepository;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,7 +32,7 @@ class SimpleChatCommand extends Command
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -39,33 +40,26 @@ class SimpleChatCommand extends Command
 
 
         // --- Select or create a discussion ---
-        $discussionId = $this->selectDiscussion($io);
+        $discussionUid = $this->selectDiscussion($io);
 
-        if ($discussionId === 0) {
+        if ($discussionUid === '') {
             $discussion = new Discussion();
             $discussion->setTitle($io->ask('Enter a Discussion Title or hit Enter', 'Discussion ' . date('Y-m-d H:i:s')));
             $discussion->setUid(uniqid());
+            $discussionUid = $discussion->getUid();
 
-            // Persist the new discussion but do not flush yet
-            $this->discussionRepository->persist($discussion);
-        } else {
-            $discussion = $this->discussionRepository->find($discussionId);
-            if (!$discussion) {
-                $io->error('Discussion not found.');
-                return Command::FAILURE;
-            }
+            $this->discussionRepository->save($discussion);
         }
-
 
         // --- Create a new context manager for each agent. ---
         $contexts = [
             'simple_agent' => $this->contextPersistedFactory->create(
-                context: new ContextWithIOTerminal(
+                contextManager: new ContextWithIOTerminal(
                     context: new Context(),
                     terminal: new Terminal($io)
                 ),
                 agentId: 'simple_agent',
-                discussion: $discussion
+                discussionUid: $discussionUid
             )
         ];
 
@@ -91,7 +85,7 @@ class SimpleChatCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function selectDiscussion(SymfonyStyle $io): ?int
+    protected function selectDiscussion(SymfonyStyle $io): ?string
     {
         $discussions = $this->discussionRepository->findAll();
 
@@ -100,14 +94,16 @@ class SimpleChatCommand extends Command
             return null;
         }
 
+        $discussionUids[0] = '';
         $io->writeln('Available discussions:');
         foreach ($discussions as $discussion) {
+            $discussionUids[$discussion->getId()] = $discussion->getUid();
             $io->writeln(sprintf('Discussion ID: %s, Title: %s, Uid: %s', $discussion->getId(), $discussion->getTitle(), $discussion->getUid()));
         }
         $io->writeln('0 : Create a new discussion');
 
         $discussionId = $io->ask('Please enter the discussion ID you want to use:');
 
-        return is_numeric($discussionId) ? (int)$discussionId : throw new \InvalidArgumentException('Invalid discussion ID provided.');
+        return $discussionUids[(int)$discussionId] ?? throw new \InvalidArgumentException('Invalid discussion ID provided.');
     }
 }

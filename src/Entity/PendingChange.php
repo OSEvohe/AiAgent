@@ -21,7 +21,7 @@ class PendingChange
     private ?string $patchContent = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $status = 'pending';
+    private string $status = 'pending';
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -60,7 +60,7 @@ class PendingChange
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): string
     {
         return $this->status;
     }
@@ -81,6 +81,12 @@ class PendingChange
     {
         $this->createdAt = $createdAt;
 
+        return $this;
+    }
+
+    public function setId(int $id): PendingChange
+    {
+        $this->id = $id;
         return $this;
     }
 }

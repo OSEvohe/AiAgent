@@ -23,7 +23,7 @@ class SimpleAgentFactory
 
     /**
      * @throws Exception
-     * @var ContextInterface[] $contextManagers
+     * @param ContextInterface[] $contextManagers
      */
     public function create(array $contextManagers): AgentRunner
     {

@@ -11,7 +11,7 @@ use Symfony\Component\Messenger\Attribute\AsMessage;
 readonly class SendMessageToAgent
 {
     public function __construct(
-        public string $discussionId,
+        public string $discussionUid,
         public string $message
     )
     {

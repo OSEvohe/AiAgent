@@ -39,9 +39,9 @@ class FilePatcher
     /**
      * The core logic for applying the patch.
      *
-     * @param array $originalLines
-     * @param array $patchLines
-     * @return array
+     * @param string[] $originalLines
+     * @param string[] $patchLines
+     * @return string[]
      * @throws Exception
      */
     private function applyPatch(array $originalLines, array $patchLines): array

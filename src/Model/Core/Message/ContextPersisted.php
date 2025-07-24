@@ -8,34 +8,31 @@ use App\Repository\DiscussionRepository;
 
 class ContextPersisted implements ContextInterface
 {
-    private readonly ContextInterface $contextManager;
-
     public function __construct(
+        private readonly ContextInterface $contextManager,
         private readonly DiscussionRepository $discussionRepository,
         private readonly ContextRepository $contextRepository,
-        private int $discussionId,
+        private string $discussionUid,
         private string $agentId
     ) {
-        $this->contextManager = new Context();
     }
 
     public function addEntry(array $entry): string
     {
-        $discussion = $this->discussionRepository->find($this->discussionId);
+        $discussion = $this->discussionRepository->findByUid($this->discussionUid);
 
         if ($discussion) {
             $entries = $this->contextRepository->findBy(['discussion' => $discussion]);
             $this->setContext((array_map(fn($entry) => $entry->getData(), $entries)));
         } else {
-            throw new \InvalidArgumentException('Discussion not found for ID: ' . $this->discussionId);
+            throw new \InvalidArgumentException('Discussion not found for ID: ' . $this->discussionUid);
         }
 
-
-        $uniqudId = $this->contextManager->addEntry($entry);
+        $uniquid = $this->contextManager->addEntry($entry);
 
         $newContextEntity = new ContextEntity();
         $newContextEntity->setAgentId($this->agentId)
-            ->setUid($uniqudId)
+            ->setUid($uniquid)
             ->setCreatedAt(new \DateTimeImmutable())
             ->setDiscussion($discussion)
             ->setRole($entry['role'])
@@ -43,7 +40,7 @@ class ContextPersisted implements ContextInterface
 
         $this->contextRepository->save($newContextEntity);
 
-        return $uniqudId;
+        return $uniquid;
     }
 
     public function getContext(): array
@@ -78,14 +75,14 @@ class ContextPersisted implements ContextInterface
         return $this;
     }
 
-    public function getDiscussionId(): int
+    public function getDiscussionUid(): string
     {
-        return $this->discussionId;
+        return $this->discussionUid;
     }
 
-    public function setDiscussionId(int $discussionId): self
+    public function setDiscussionId(string $discussionUid): self
     {
-        $this->discussionId = $discussionId;
+        $this->discussionUid = $discussionUid;
         return $this;
     }
 }

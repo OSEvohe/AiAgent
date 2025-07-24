@@ -90,4 +90,10 @@ class Discussion
 
         return $this;
     }
+
+    public function setId(?int $id): Discussion
+    {
+        $this->id = $id;
+        return $this;
+    }
 }

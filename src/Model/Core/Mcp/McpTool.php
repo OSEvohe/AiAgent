@@ -28,15 +28,13 @@ class McpTool extends AITool
         $arguments = json_decode($toolCall->function->toArray()['arguments'], true);
 
         try {
+            $result = $this->server->callTool($this->getName(), $arguments);
 
-                $result = $this->server->callTool($this->getName(), $arguments);
-
-                return ToolResultResponse::fromArray([
-                    'tool_call_id' => $toolCall->id,
-                    'tool_name' => $this->getName(),
-                    'content' => json_encode($result->content),
-                ]);
-
+            return ToolResultResponse::fromArray([
+                'tool_call_id' => $toolCall->id,
+                'tool_name' => $this->getName(),
+                'content' => json_encode($result->content),
+            ]);
         } catch (Throwable $e) {
             return ToolResultResponse::fromArray([
                 'tool_call_id' => $toolCall->id,

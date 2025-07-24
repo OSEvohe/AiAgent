@@ -41,7 +41,7 @@ class OpenAIService implements OpenAIServiceInterface
     public function getModels(): array
     {
         $response = $this->client->models()->list();
-        return $response->toArray()['data'] ?? [];
+        return $response->toArray()['data'];
     }
 
     public function sendToLlm(array $context = []): CreateResponse|StreamResponse

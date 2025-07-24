@@ -16,12 +16,13 @@ readonly class ContextPersistedFactory
     ) {
     }
 
-    public function create(ContextInterface $context, string $agentId, int $discussionId): ContextPersisted
+    public function create(ContextInterface $contextManager, string $agentId, string $discussionUid): ContextPersisted
     {
         return new ContextPersisted(
+            contextManager: $contextManager,
             discussionRepository: $this->discussionRepository,
             contextRepository: $this->contextRepository,
-            discussionId: $discussionId,
+            discussionUid: $discussionUid,
             agentId: $agentId
         );
     }

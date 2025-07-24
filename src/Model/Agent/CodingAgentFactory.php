@@ -23,7 +23,7 @@ class CodingAgentFactory
 
     /**
      * @throws Exception
-     * @var ContextInterface[] $contextManagers
+     * @param ContextInterface[] $contextManagers
      */
     public function create(array $contextManagers): AgentRunner
     {
@@ -59,7 +59,7 @@ class CodingAgentFactory
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'examples/coding_agent.json'),
             parallelToolCalls: true,
             toolChoice: 'auto',
-            temperature: 0.01,
+            temperature: 0.15,
             topP: 0.95,
             minP: 0.01,
             topk: 64

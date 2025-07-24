@@ -40,42 +40,37 @@ class BasicChatCommand extends Command
 
 
         // --- Select or create a discussion ---
-        $discussionId = $this->selectDiscussion($io);
+        $discussionUid = $this->selectDiscussion($io);
 
-        if ($discussionId === 0) {
+        if ($discussionUid === '') {
             $discussion = new Discussion();
             $discussion->setTitle($io->ask('Enter a Discussion Title or hit Enter', 'Discussion ' . date('Y-m-d H:i:s')));
             $discussion->setUid(uniqid());
+            $discussionUid = $discussion->getUid();
 
             // Persist the new discussion but do not flush yet
-            $this->discussionRepository->persist($discussion);
-        } else {
-            $discussion = $this->discussionRepository->find($discussionId);
-            if (!$discussion) {
-                $io->error('Discussion not found.');
-                return Command::FAILURE;
-            }
+            $this->discussionRepository->save($discussion);
         }
 
 
         // --- Create a new context manager for each agent. ---
         $contexts = [
             'coding_agent' => $this->contextPersistedFactory->create(
-                context: new ContextWithIOTerminal(
+                contextManager: new ContextWithIOTerminal(
                     context: new Context(),
                     terminal: new Terminal($io)
                 ),
                 agentId: 'coding_agent',
-                discussion: $discussion
+                discussionUid: $discussionUid
             ),
             'search_agent' => $this->contextPersistedFactory->create(
-                context: new ContextWithIOTerminal(
+                contextManager: new ContextWithIOTerminal(
                     context: new Context(),
                     terminal: new Terminal($io),
                     outputAssistant: false
                 ),
                 agentId: 'search_agent',
-                discussion: $discussion
+                discussionUid: $discussionUid
             )
         ];
 
@@ -101,7 +96,7 @@ class BasicChatCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function selectDiscussion(SymfonyStyle $io): ?int
+    protected function selectDiscussion(SymfonyStyle $io): ?string
     {
         $discussions = $this->discussionRepository->findAll();
 
@@ -110,14 +105,16 @@ class BasicChatCommand extends Command
             return null;
         }
 
+        $discussionUids[0] = '';
         $io->writeln('Available discussions:');
         foreach ($discussions as $discussion) {
+            $discussionUids[$discussion->getId()] = $discussion->getUid();
             $io->writeln(sprintf('Discussion ID: %s, Title: %s, Uid: %s', $discussion->getId(), $discussion->getTitle(), $discussion->getUid()));
         }
         $io->writeln('0 : Create a new discussion');
 
         $discussionId = $io->ask('Please enter the discussion ID you want to use:');
 
-        return is_numeric($discussionId) ? (int)$discussionId : throw new \InvalidArgumentException('Invalid discussion ID provided.');
+        return $discussionUids[(int)$discussionId] ?? throw new \InvalidArgumentException('Invalid discussion ID provided.');
     }
 }

@@ -108,4 +108,10 @@ class Context
 
         return $this;
     }
+
+    public function setId(?int $id): Context
+    {
+        $this->id = $id;
+        return $this;
+    }
 }

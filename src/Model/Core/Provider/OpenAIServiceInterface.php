@@ -20,7 +20,7 @@ interface OpenAIServiceInterface
     /**
      * Sends a message to the LLM and returns the response
      *
-     * @param array $context
+     * @param array<string, mixed> $context
      * @return CreateResponse|StreamResponse
      */
     public function sendToLlm(array $context= []): CreateResponse|StreamResponse;

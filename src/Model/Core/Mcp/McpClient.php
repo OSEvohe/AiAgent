@@ -9,6 +9,7 @@ use PhpMcp\Client\JsonRpc\Results\CallToolResult;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
 use PhpMcp\Client\Model\Definitions\ToolDefinition;
 use PhpMcp\Client\ServerConfig;
+use RuntimeException;
 use Throwable;
 
 class McpClient
@@ -16,7 +17,7 @@ class McpClient
     protected Client $client;
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     private function __construct(
         ServerConfig $serverConfig,
@@ -41,7 +42,7 @@ class McpClient
             try {
                 $this->client->initialize();
             } catch (Throwable $e) {
-                throw new \RuntimeException('Failed to connect to MCP server: ' . $e->getMessage());
+                throw new RuntimeException('Failed to connect to MCP server: ' . $e->getMessage());
             }
 
             McpsPool::addMcp(name: $this->name, client: $this->client);
@@ -56,20 +57,20 @@ class McpClient
         $jsonConfig = json_decode(self::loadJsonConfig($filePath), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException('Invalid JSON configuration: ' . json_last_error_msg());
+            throw new RuntimeException('Invalid JSON configuration: ' . json_last_error_msg());
         }
 
         $mcpServers = [];
         foreach ($jsonConfig['mcpServers'] as $serverName => $server) {
             if (!isset($server['command']) || !isset($server['args'])) {
-                throw new \RuntimeException('Configuration must include "command" and args fields.');
+                throw new RuntimeException('Configuration must include "command" and args fields.');
             }
 
             $serverConfig = self::createServerConfig(
                 name: $serverName,
                 command: $server['command'],
                 args: $server['args'],
-                transport: TransportType::from($server['transport'] ?? 'stdio') ?? TransportType::Stdio,
+                transport: TransportType::from($server['transport'] ?? 'stdio'),
                 timeout: $server['timeout'] ?? 600
             );
 
@@ -99,7 +100,7 @@ class McpClient
 
             return $list;
         } catch (Throwable $e) {
-            throw new \RuntimeException('Failed to list tools: ' . $e->getMessage());
+            throw new RuntimeException('Failed to list tools: ' . $e->getMessage());
         }
     }
 
@@ -116,8 +117,10 @@ class McpClient
                 return $this->client->callTool($toolName, $arguments);
             }
         } catch (Throwable $e) {
-            throw new \RuntimeException('Failed to call tool: ' . $e->getMessage());
+            throw new RuntimeException('Failed to call tool: ' . $e->getMessage());
         }
+
+        throw new RuntimeException('MCP client is not ready or tool does not exist: ' . $toolName);
     }
 
     /**
