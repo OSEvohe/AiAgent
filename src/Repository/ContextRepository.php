@@ -21,4 +21,13 @@ class ContextRepository extends ServiceEntityRepository
         $this->getEntityManager()->persist($context);
         $this->getEntityManager()->flush();
     }
+
+    public function findByUid(string $entryUid): ?Context
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.uid = :uid')
+            ->setParameter('uid', $entryUid)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

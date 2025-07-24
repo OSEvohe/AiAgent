@@ -65,4 +65,9 @@ readonly class ContextWithIOTerminal implements ContextInterface
 
         return $this;
     }
+
+    public function updateEntry(array $entry, string $entryUid): string
+    {
+        return $this->context->updateEntry($entry, $entryUid);
+    }
 }

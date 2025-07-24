@@ -43,6 +43,27 @@ class ContextPersisted implements ContextInterface
         return $uniquid;
     }
 
+    public function updateEntry(array $entry, string $entryUid): string
+    {
+        $contextEntity = $this->contextRepository->findByUid($entryUid);
+
+        if ($contextEntity) {
+            $contextEntity->setData($entry);
+            $this->contextRepository->save($contextEntity);
+
+            // Update the context manager with the new data
+            $discussion = $this->discussionRepository->findByUid($contextEntity->getDiscussion()->getUid());
+            if ($discussion) {
+                $entries = $this->contextRepository->findBy(['discussion' => $discussion]);
+                $this->setContext((array_map(fn($entry) => $entry->getData(), $entries)));
+            }
+
+            return $entryUid;
+        } else {
+            throw new \InvalidArgumentException('Entry not found for UID: ' . $entryUid);
+        }
+    }
+
     public function getContext(): array
     {
         return $this->contextManager->getContext();

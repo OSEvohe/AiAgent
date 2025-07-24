@@ -64,4 +64,11 @@ class Context implements ContextInterface
 
         return $this;
     }
+
+    public function updateEntry(array $entry, string $entryUid): string
+    {
+        $this->context[$entryUid] = $entry;
+
+        return $entryUid;
+    }
 }
