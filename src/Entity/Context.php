@@ -29,6 +29,9 @@ class Context
     #[ORM\Column(length: 255)]
     private ?string $agentId = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $uid = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,18 @@ class Context
     public function setAgentId(string $agentId): static
     {
         $this->agentId = $agentId;
+
+        return $this;
+    }
+
+    public function getUid(): ?string
+    {
+        return $this->uid;
+    }
+
+    public function setUid(string $uid): static
+    {
+        $this->uid = $uid;
 
         return $this;
     }

@@ -6,6 +6,7 @@ use App\Entity\PendingChange;
 use App\Model\Core\Message\ToolResultResponse;
 use App\Model\Core\Tool\AITool;
 use App\Repository\PendingChangeRepository;
+use App\Service\FilePatcher;
 use OpenAI\Responses\Chat\CreateResponseToolCall;
 use Exception;
 
@@ -14,14 +15,12 @@ use Exception;
  */
 class FilePatcherTool extends AITool
 {
-    private PendingChangeRepository $pendingChangeRepository;
-
-    public function __construct(PendingChangeRepository $pendingChangeRepository)
+    public function __construct(private readonly FilePatcher $filePatcher)
     {
-        $this->pendingChangeRepository = $pendingChangeRepository;
+
 
         $name = 'edit_file_with_patch';
-        $description = 'Creates a pending change for a file in the workspace using a patch format. Use `// ...existing code...` to represent unchanged regions.';
+        $description = 'Edit a file in the workspace using a patch format. Use `// ...existing code...` to represent unchanged regions.';
         $parameters = [
             'type' => 'object',
             'properties' => [
@@ -47,21 +46,16 @@ class FilePatcherTool extends AITool
         $patchContent = $arguments['patchContent'];
 
         try {
-            $pendingChange = new PendingChange();
-            $pendingChange->setFilePath($filePath);
-            $pendingChange->setPatchContent($patchContent);
-
-            $this->pendingChangeRepository->save($pendingChange);
+            $this->filePatcher->patchFile($filePath, $patchContent);
 
             $result = [
                 'status' => 'success',
-                'message' => "Pending change created for file {$filePath}.",
-                'pending_change_id' => $pendingChange->getId(),
+                'message' => "patch change applied for file {$filePath}.",
             ];
         } catch (Exception $e) {
             $result = [
                 'status' => 'error',
-                'message' => "Failed to create pending change for file {$filePath}: " . $e->getMessage(),
+                'message' => "Failed to apply change for file {$filePath}: " . $e->getMessage(),
             ];
         }
 

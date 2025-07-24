@@ -3,7 +3,7 @@
 namespace App\MessageHandler\Command;
 
 use App\Factory\ContextPersistedFactory;
-use App\Model\Agent\SimpleAgentFactory;
+use App\Model\Agent\CodingAgentFactory;
 use App\Model\Core\Agent\AgentRunner;
 use App\Model\Core\Message\Context;
 use Exception;
@@ -20,7 +20,7 @@ class SendMessageToAgentHandler
      */
     public function __construct(
         private readonly ContextPersistedFactory $contextPersistedFactory,
-        private readonly SimpleAgentFactory $simpleAgentFactory,
+        private readonly CodingAgentFactory $factory,
     ) {
     }
 
@@ -32,16 +32,21 @@ class SendMessageToAgentHandler
         if ($this->codingAgentRunner === null) {
             // --- Create a new context manager for each agent. ---
             $this->contexts = [
-                'simple_agent' => $this->contextPersistedFactory->create(
+                'coding_agent' => $this->contextPersistedFactory->create(
                     context: new Context(),
-                    agentId: 'simple_agent',
+                    agentId: 'coding_agent',
+                    discussionId: $command->discussionId,
+                ),
+                'search_agent' => $this->contextPersistedFactory->create(
+                    context: new Context(),
+                    agentId: 'search_agent',
                     discussionId: $command->discussionId,
                 )
             ];
-            $this->codingAgentRunner = $this->simpleAgentFactory->create($this->contexts);
+            $this->codingAgentRunner = $this->factory->create($this->contexts);
         }
-
-        $this->contexts['simple_agent']->setDiscussionId($command->discussionId);
+        $this->contexts['coding_agent']->setDiscussionId($command->discussionId);
+        $this->contexts['search_agent']->setDiscussionId($command->discussionId);
         $this->codingAgentRunner->sendUserMessage($command->message);
     }
 

@@ -1,12 +1,12 @@
 <section data-action="scroll->message-area#scrolling" data-message-area-target="messageArea" class="message-area py-5 px-3" id="chatMessages"
-         style="position: relative" {{ attributes.defaults(stimulus_controller('message-area')) }} data-poll="delay(2000)|$render">
+         style="position: relative" {{ attributes.defaults(stimulus_controller('message-area')) }} data-poll="delay(500)|$render">
     {% for entry in this.messages %}
         {% if entry.role == 'assistant' and entry.data.tool_calls is defined and entry.data.tool_calls|length > 0 %}
             <div class="row">
                 <div class="col-sm-12 col-xl-7 offset-xl-2">
                     <div class="message-wrapper ai-message-wrapper float-start">
                         <div class="message tool-message" data-live-ignore>
-                            <p><strong>&#x1F6E0;</strong> {{ entry.data.tool_calls[0].function.name }}</p>
+                            <span title="{{ entry.data.tool_calls[0].function.arguments }}"><strong>&#x1F6E0;</strong> {{ entry.data.tool_calls[0].function.name }}</span>
                         </div>
                     </div>
                 </div>
@@ -25,7 +25,7 @@
             </div>
         {% endif %}
 
-        {% if entry.role == 'assistant' and entry.data.content is not null %}
+        {% if entry.role == 'assistant' and entry.data.content is not null and entry.agentId == 'coding_agent' %}
             <div class="row" data-live-ignore>
                 <div class="col-sm-12 col-xl-7 offset-xl-1">
                     <div class="message-wrapper ai-message-wrapper float-start">

@@ -30,6 +30,7 @@ class CodingAgentFactory
         $aiService = new OpenAIService($_ENV['LLM_URL'] . $_ENV['LLM_ENDPOINT']);
         $systemPromptsDir = $_ENV['AGENT_PROMPTS_DIR'] ?? '';
 
+        /*
         $searchAgent = new Agent(
             openAIService: $aiService,
             contextManager: $contextManagers['search_agent']->setSystemMessage(new SystemMessage($this->loadSystemPrompt($systemPromptsDir . 'examples/search_agent.txt'))),
@@ -43,9 +44,10 @@ class CodingAgentFactory
             temperature: 0.15,
             topP: 0.95,
             minP: 0.01,
+            topk: 64
         );
 
-
+*/
         // --- Create the Coding Agent ---
         $codingAgent = new Agent(
             openAIService: $aiService,
@@ -53,13 +55,14 @@ class CodingAgentFactory
             agentName: 'CodingAgentFactory',
             agentId: 'coding_agent',
             model: '',
-            tools: [new AgentTool($searchAgent->initialize(new AgentRunner()), 'search_agent_tool', 'This agent can search online documentation and resources to find information. You must specify in the task argument to do a deep search if it is required')],
+            tools: [], //[new AgentTool($searchAgent->initialize(new AgentRunner()), 'search_agent_tool', 'This agent can search online documentation and resources to find information. You must specify in the task argument to do a deep search if it is required')],
             mcps: McpClient::fromJsonConfig($_ENV['AGENT_CONFIG_DIR'] . 'examples/coding_agent.json'),
             parallelToolCalls: true,
             toolChoice: 'auto',
-            temperature: 0.15,
+            temperature: 0.01,
             topP: 0.95,
             minP: 0.01,
+            topk: 64
         );
 
         return $codingAgent->initialize(new AgentRunner());

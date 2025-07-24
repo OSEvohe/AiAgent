@@ -26,7 +26,9 @@ class MessageAreaComponent
 
     public function getMessages(): array
     {
-        return $this->contextRepository->findBy(['discussion' => $this->discussionId]);
+        $results =  $this->contextRepository->findBy(['discussion' => $this->discussionId]);
+
+        return $results;
     }
 
     public function getMarkdown(string $text): string

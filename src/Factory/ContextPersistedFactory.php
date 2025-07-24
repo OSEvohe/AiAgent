@@ -19,7 +19,6 @@ readonly class ContextPersistedFactory
     public function create(ContextInterface $context, string $agentId, int $discussionId): ContextPersisted
     {
         return new ContextPersisted(
-            contextManager: $context,
             discussionRepository: $this->discussionRepository,
             contextRepository: $this->contextRepository,
             discussionId: $discussionId,

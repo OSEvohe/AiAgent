@@ -16,11 +16,12 @@ class Context implements ContextInterface
         return $this->context;
     }
 
-    public function addEntry(array $entry): self
+    public function addEntry(array $entry): string
     {
-        $this->context[uniqid()] = $entry;
+        $uniqid = uniqid();
+        $this->context[$uniqid] = $entry;
 
-        return $this;
+        return $uniqid ;
     }
 
     public function getEntry(int $key): ?array

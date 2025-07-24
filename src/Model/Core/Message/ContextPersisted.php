@@ -3,24 +3,24 @@
 namespace App\Model\Core\Message;
 
 use App\Entity\Context as ContextEntity;
-use App\Entity\Discussion;
 use App\Repository\ContextRepository;
 use App\Repository\DiscussionRepository;
 
 class ContextPersisted implements ContextInterface
 {
+    private readonly ContextInterface $contextManager;
+
     public function __construct(
-        private readonly ContextInterface $contextManager,
         private readonly DiscussionRepository $discussionRepository,
         private readonly ContextRepository $contextRepository,
         private int $discussionId,
         private string $agentId
     ) {
+        $this->contextManager = new Context();
     }
 
-    public function addEntry(array $entry): self
+    public function addEntry(array $entry): string
     {
-
         $discussion = $this->discussionRepository->find($this->discussionId);
 
         if ($discussion) {
@@ -31,10 +31,11 @@ class ContextPersisted implements ContextInterface
         }
 
 
-        $this->contextManager->addEntry($entry);
+        $uniqudId = $this->contextManager->addEntry($entry);
 
         $newContextEntity = new ContextEntity();
         $newContextEntity->setAgentId($this->agentId)
+            ->setUid($uniqudId)
             ->setCreatedAt(new \DateTimeImmutable())
             ->setDiscussion($discussion)
             ->setRole($entry['role'])
@@ -42,7 +43,7 @@ class ContextPersisted implements ContextInterface
 
         $this->contextRepository->save($newContextEntity);
 
-        return $this;
+        return $uniqudId;
     }
 
     public function getContext(): array
