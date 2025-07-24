@@ -39,7 +39,9 @@ class Context implements ContextInterface
         }
 
         foreach ($this->context as $entry) {
-            $contextArray[] = $entry;
+            if (($entry['content'] ?? false) !== 'Processing...') {
+                $contextArray[] = $entry;
+            }
         }
 
         return $contextArray;

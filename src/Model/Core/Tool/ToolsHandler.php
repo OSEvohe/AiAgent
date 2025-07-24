@@ -48,9 +48,8 @@ class ToolsHandler
     /**
      * @throws Exception
      */
-    public function handleSingleToolCall(
-        CreateResponseToolCall $toolCall
-    ): ToolResultResponse {
+    public function handleSingleToolCall(CreateResponseToolCall $toolCall): ToolResultResponse
+    {
         foreach ($this->tools as $tool) {
             if ($tool->getName() === $toolCall->function->name) {
                 return $tool->execute($toolCall);

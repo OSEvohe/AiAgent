@@ -15,8 +15,8 @@ class AgentRunner
     private AgentInterface $agent;
     private ContextInterface $contextManager;
 
-    public function __construct(
-    ) {
+    public function __construct()
+    {
     }
 
 
@@ -57,11 +57,17 @@ class AgentRunner
      */
     public function processResponse(int $step = 0): string
     {
+        // first create an empty entry in the context so that we can update it later, allowing UI to show a pending response and allowing stream responses (later)
+        $entryUid = $this->contextManager->addEntry(
+            entry: ['role' => 'assistant', 'content' => 'Processing...', 'tool_calls' => []],
+            entryUid: uniqid()
+        );
+
         $response = $this->processContext();
         $responseContent = '';
 
         foreach ($response->choices as $choice) {
-            $this->contextManager->addEntry($choice->message->toArray());
+            $this->contextManager->updateEntry($choice->message->toArray(), $entryUid);
 
             if ($choice->message->content) {
                 $responseContent = $choice->message->content;
@@ -70,7 +76,7 @@ class AgentRunner
             if ($choice->message->toolCalls && $step <= 99) {
                 try {
                     $toolResult = $this->toolsHandler->handleSingleToolCall($choice->message->toolCalls[0]);
-                    $this->contextManager->addEntry($toolResult->toArray());
+                    $this->contextManager->addEntry(entry: $toolResult->toArray());
                     $responseContent = $this->processResponse($step + 1);
                 } catch (Exception $e) {
                     return 'Error executing tool: ' . $e->getMessage();

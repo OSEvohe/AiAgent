@@ -46,6 +46,8 @@ class OpenAIService implements OpenAIServiceInterface
 
     public function sendToLlm(array $context = []): CreateResponse|StreamResponse
     {
+        dump($context);
+
         return $this->client->chat()->create($context);
     }
 }

@@ -26,11 +26,15 @@
         {% endif %}
 
         {% if entry.role == 'assistant' and entry.data.content is not null and entry.agentId == 'coding_agent' %}
-            <div class="row" data-live-ignore>
+            <div class="row">
                 <div class="col-sm-12 col-xl-7 offset-xl-1">
                     <div class="message-wrapper ai-message-wrapper float-start">
-                        <div class="message ai-message" data-live-ignore>
-                            {{ this.markdown(entry.data.content)|raw }}
+                        <div class="message ai-message">
+                            {% if entry.data.content == 'Processing...' %}
+                                <span class="spinner-border">{{ ux_icon('gg:spinner') }}</span>
+                            {% else %}
+                                {{ this.markdown(entry.data.content)|raw }}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
